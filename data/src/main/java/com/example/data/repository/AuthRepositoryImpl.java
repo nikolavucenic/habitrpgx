@@ -22,6 +22,10 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
+import com.example.data.remote.firebase.FirebaseService;
+import com.example.domain.core.Result;
+import com.example.domain.model.User;
+import com.example.domain.repository.AuthRepository;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -151,6 +155,15 @@ public class AuthRepositoryImpl implements AuthRepository {
         } catch (Exception e) {
             return new Result.Error<>("Failed to read activation status: " + e.getMessage());
         }
+
+    @Inject
+    public AuthRepositoryImpl(FirebaseService firebaseService) {
+        this.firebaseService = firebaseService;
+    }
+
+    @Override
+    public Result<Void> register(String email, String password, String username, int avatarId) {
+        return new Result.Error<>("Not implemented in S1-0 skeleton");
     }
 
     @Override
@@ -205,6 +218,7 @@ public class AuthRepositoryImpl implements AuthRepository {
         } catch (Exception e) {
             return new Result.Error<>("Login failed: " + e.getMessage());
         }
+        return new Result.Error<>("Not implemented in S1-0 skeleton");
     }
 
     @Override
