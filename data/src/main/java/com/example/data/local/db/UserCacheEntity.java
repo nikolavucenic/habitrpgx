@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "user_cache")
 public class UserCacheEntity {
     @PrimaryKey
-    @ColumnInfo(name = "user_id")
-    public String userId;
+    @ColumnInfo(name = "uid")
+    public String uid;
 
     @ColumnInfo(name = "email")
     public String email;
@@ -19,9 +19,9 @@ public class UserCacheEntity {
     @ColumnInfo(name = "avatar_id")
     public int avatarId;
 
-    @ColumnInfo(name = "activation_status")
-    public String activationStatus;
+    @ColumnInfo(name = "level")
+    public int level;
 
-    @ColumnInfo(name = "updated_at")
-    public long updatedAtEpochMillis;
+    @ColumnInfo(name = "xp")
+    public int xp;
 }
