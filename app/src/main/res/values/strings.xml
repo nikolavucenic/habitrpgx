@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">HabitRPG</string>
+    <string name="profile">Profil</string>
+    <string name="tasks">Zadaci</string>
+    <string name="shop">Prodavnica</string>
+    <string name="alliance">Savez</string>
+</resources>
