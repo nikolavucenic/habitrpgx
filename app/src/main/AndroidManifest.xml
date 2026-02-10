@@ -13,7 +13,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HabitRPG">
         <activity
-            android:name=".MainActivity"
+            android:name=".presentation.auth.ActivationHandlerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="activate"
+                    android:scheme="myapp" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".presentation.auth.AuthActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,6 +36,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
