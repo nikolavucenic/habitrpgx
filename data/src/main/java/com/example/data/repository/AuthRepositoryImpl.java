@@ -2,8 +2,6 @@ package com.example.data.repository;
 
 import com.example.data.remote.firebase.FirebaseService;
 import com.example.domain.core.Result;
-import com.example.domain.model.ActivationToken;
-import com.example.domain.model.RegistrationRequest;
 import com.example.domain.model.User;
 import com.example.domain.repository.AuthRepository;
 
@@ -20,22 +18,7 @@ public class AuthRepositoryImpl implements AuthRepository {
     }
 
     @Override
-    public Result<String> register(RegistrationRequest request) {
-        return new Result.Error<>("Not implemented in S1-0 skeleton");
-    }
-
-    @Override
-    public Result<ActivationToken> createActivationToken(String userId) {
-        return new Result.Error<>("Not implemented in S1-0 skeleton");
-    }
-
-    @Override
-    public Result<Void> activate(String token) {
-        return new Result.Error<>("Not implemented in S1-0 skeleton");
-    }
-
-    @Override
-    public Result<Boolean> isUserActive(String userId) {
+    public Result<Void> register(String email, String password, String username, int avatarId) {
         return new Result.Error<>("Not implemented in S1-0 skeleton");
     }
 
