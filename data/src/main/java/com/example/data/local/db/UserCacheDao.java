@@ -11,8 +11,8 @@ public interface UserCacheDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsert(UserCacheEntity entity);
 
-    @Query("SELECT * FROM user_cache WHERE user_id = :userId LIMIT 1")
-    UserCacheEntity getById(String userId);
+    @Query("SELECT * FROM user_cache WHERE uid = :uid LIMIT 1")
+    UserCacheEntity getById(String uid);
 
     @Query("DELETE FROM user_cache")
     void clear();
