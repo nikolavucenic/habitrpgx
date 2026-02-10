@@ -19,6 +19,12 @@ public class UserCacheEntity {
     @ColumnInfo(name = "avatar_id")
     public int avatarId;
 
+    @ColumnInfo(name = "activation_status")
+    public String activationStatus;
+
+    @ColumnInfo(name = "updated_at")
+    public long updatedAtEpochMillis;
+  
     @ColumnInfo(name = "level")
     public int level;
 
