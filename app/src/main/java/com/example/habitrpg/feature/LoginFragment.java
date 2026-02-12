@@ -5,14 +5,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+
 import com.example.habitrpg.R;
 import com.example.habitrpg.core.CoreFragment;
 import com.example.habitrpg.core.SimpleTextWatcher;
 import com.example.habitrpg.databinding.FragmentLoginBinding;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class LoginFragment extends CoreFragment<FragmentLoginBinding> {
 
     private LoginViewModel viewModel;
@@ -25,6 +32,7 @@ public class LoginFragment extends CoreFragment<FragmentLoginBinding> {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        viewModel = new ViewModelProvider(this).get(LoginViewModel.class);
         setupObservers();
         setupListeners();
     }
@@ -63,7 +71,6 @@ public class LoginFragment extends CoreFragment<FragmentLoginBinding> {
     private void setupListeners() {
         getBinding().btnLogin.setOnClickListener(v -> viewModel.handleAction(new LoginAction.OnLoginClicked()));
         getBinding().btnGoToRegister.setOnClickListener(v -> viewModel.handleAction(new LoginAction.OnGoToRegisterClicked()));
-        //getBinding().btnForgotPassword.setOnClickListener(v -> viewModel.handleAction());
 
         getBinding().etEmail.addTextChangedListener(new SimpleTextWatcher(s ->
                 viewModel.handleAction(new LoginAction.OnEmailChanged(s))
