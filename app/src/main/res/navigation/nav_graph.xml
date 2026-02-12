@@ -1,8 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_graph">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@navigation/auth_graph">
 
+    <include app:graph="@navigation/auth_graph">
+        <action
+            android:id="@+id/action_auth_to_dashboard"
+            app:destination="@id/dashboardFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </include>
+
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.example.habitrpg.DashboardFragment"
+        android:label="fragment_dashboard"
+        tools:layout="@layout/fragment_dashboard" />
 
 
 </navigation>

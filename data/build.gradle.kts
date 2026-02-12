@@ -9,6 +9,8 @@ android {
 
     defaultConfig {
         minSdk = 24
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
 
@@ -21,7 +23,6 @@ android {
             )
         }
     }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -29,17 +30,21 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain"))
+    implementation(project("::domain"))
 
+    implementation(libs.appcompat)
+    implementation(libs.material)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+
+    // Hilt
     implementation(libs.hilt.android)
+    implementation(libs.hilt.compiler)
     annotationProcessor(libs.hilt.compiler)
 
-    implementation(libs.room.runtime)
-    annotationProcessor(libs.room.compiler)
-
+    // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
-
-    testImplementation(libs.junit)
 }

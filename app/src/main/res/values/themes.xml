@@ -1,9 +1,116 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.HabitRPG" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <style name="Theme.HabitRPG" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">#6750A4</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorContainer">#F3EDF7</item>
+
+        <item name="textAppearanceDisplayLarge">@style/AppTextAppearance.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/AppTextAppearance.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/AppTextAppearance.DisplaySmall</item>
+
+        <item name="textAppearanceHeadlineLarge">@style/AppTextAppearance.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/AppTextAppearance.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/AppTextAppearance.HeadlineSmall</item>
+
+        <item name="textAppearanceTitleLarge">@style/AppTextAppearance.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/AppTextAppearance.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/AppTextAppearance.TitleSmall</item>
+
+        <item name="textAppearanceBodyLarge">@style/AppTextAppearance.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/AppTextAppearance.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/AppTextAppearance.BodySmall</item>
+
+        <item name="textAppearanceLabelLarge">@style/AppTextAppearance.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/AppTextAppearance.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/AppTextAppearance.LabelSmall</item>
     </style>
 
-    <style name="Theme.HabitRPG" parent="Base.Theme.HabitRPG" />
+    <style name="AppTextAppearance.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
+        <item name="android:textSize">57sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+    <style name="AppTextAppearance.DisplayMedium" parent="TextAppearance.Material3.DisplayMedium">
+        <item name="android:textSize">45sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="AppTextAppearance.DisplaySmall" parent="TextAppearance.Material3.DisplaySmall">
+        <item name="android:textSize">36sp</item>
+    </style>
+
+    <style name="AppTextAppearance.HeadlineLarge" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:textSize">32sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="AppTextAppearance.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="AppTextAppearance.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="AppTextAppearance.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="AppTextAppearance.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.01</item>
+    </style>
+    <style name="AppTextAppearance.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="AppTextAppearance.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="AppTextAppearance.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="AppTextAppearance.BodySmall" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="AppTextAppearance.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="AppTextAppearance.LabelMedium" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="AppTextAppearance.LabelSmall" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
+    <style name="AppTextAppearance.BodyLarge.Normal" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="AppTextAppearance.BodyMedium.Normal" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="AppTextAppearance.BodySmall.Normal" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="AppTextAppearance.TitleMedium.Normal" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="AppTextAppearance.TitleSmall.Normal" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
 </resources>

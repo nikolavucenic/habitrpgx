@@ -6,7 +6,7 @@ public class User {
     public final String uid;
     public final String email;
     public final String username;
-    public final int avatarId; // 1..5 immutable
+    public final int avatarId;
     public final int level;
     public final String title;
     public final int pp;
