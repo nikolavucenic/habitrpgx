@@ -3,16 +3,24 @@ package com.example.habitrpg.feature;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.lifecycle.SavedStateHandle;
+
 import com.example.domain.core.Result;
 import com.example.domain.model.User;
 import com.example.domain.usecase.LoginUseCase;
 import com.example.habitrpg.core.CoreViewModel;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
 public class LoginViewModel extends CoreViewModel<LoginUiState, LoginAction, LoginSideEffect> {
 
     private final LoginUseCase loginUseCase;
 
-    public LoginViewModel(LoginUseCase loginUseCase) {
+    @Inject
+    public LoginViewModel(LoginUseCase loginUseCase, SavedStateHandle savedStateHandle) {
         this.loginUseCase = loginUseCase;
         state.setValue(new LoginUiState.Input("", "", null));
     }
