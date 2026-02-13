@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     android:padding="16dp"
     tools:context=".feature.progression.ProgressionFragment">
 
@@ -16,94 +18,176 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/progression_title"
-            android:textSize="22sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/tv_hero_name_title"
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#1F6750A4"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="14dp">
+
+                <ImageView
+                    android:id="@+id/iv_avatar"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:contentDescription="@string/progression_avatar_content_description"
+                    android:src="@drawable/avatar_1"
+                    tools:src="@drawable/avatar_3" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_hero_name_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        tools:text="Heroj • Početnik navika" />
+
+                    <TextView
+                        android:id="@+id/tv_level"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textSize="16sp"
+                        tools:text="Nivo: 1" />
+
+                    <TextView
+                        android:id="@+id/tv_pp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="16sp"
+                        tools:text="PP: 0" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            tools:text="Heroj • Početnik navika" />
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#1F6750A4"
+            app:strokeWidth="1dp">
 
-        <TextView
-            android:id="@+id/tv_level"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp"
-            tools:text="Nivo: 1" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
 
-        <TextView
-            android:id="@+id/tv_pp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textSize="16sp"
-            tools:text="PP: 0" />
+                <TextView
+                    android:id="@+id/tv_xp_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    tools:text="XP: 120 / 200" />
 
-        <TextView
-            android:id="@+id/tv_xp_value"
+                <ProgressBar
+                    android:id="@+id/progress_xp"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:max="200"
+                    android:progress="0" />
+
+                <TextView
+                    android:id="@+id/tv_xp_needed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textSize="14sp"
+                    tools:text="Potrebno još 80 XP za sledeći nivo" />
+
+                <TextView
+                    android:id="@+id/tv_error"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="#B00020"
+                    android:visibility="gone"
+                    tools:text="Greška pri učitavanju profila" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textStyle="bold"
-            tools:text="XP: 120 / 200" />
+            app:cardCornerRadius="16dp"
+            app:cardElevation="1dp"
+            app:strokeColor="#146750A4"
+            app:strokeWidth="1dp">
 
-        <ProgressBar
-            android:id="@+id/progress_xp"
-            style="?android:attr/progressBarStyleHorizontal"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/progression_importance_title"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_importance_values"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    tools:text="• Normalan: 1 XP\n• Važan: 3 XP\n• Ekstremno važan: 10 XP\n• Specijalan: 100 XP" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:max="200"
-            android:progress="0" />
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="1dp"
+            app:strokeColor="#146750A4"
+            app:strokeWidth="1dp">
 
-        <TextView
-            android:id="@+id/tv_xp_needed"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textSize="14sp"
-            tools:text="Potrebno još 80 XP za sledeći nivo" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
 
-        <TextView
-            android:id="@+id/tv_error"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textColor="#B00020"
-            android:visibility="gone"
-            tools:text="Greška pri učitavanju profila" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/progression_difficulty_title"
+                    android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:text="@string/progression_importance_title"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tv_importance_values"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            tools:text="• Normalan: 1 XP\n• Važan: 3 XP\n• Ekstremno važan: 10 XP\n• Specijalan: 100 XP" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:text="@string/progression_difficulty_title"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tv_difficulty_values"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            tools:text="• Lako: 2 XP\n• Srednje: 5 XP\n• Teško: 9 XP" />
+                <TextView
+                    android:id="@+id/tv_difficulty_values"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    tools:text="• Lako: 2 XP\n• Srednje: 5 XP\n• Teško: 9 XP" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
