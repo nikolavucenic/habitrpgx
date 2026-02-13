@@ -22,7 +22,7 @@ public class SignUpViewModel extends CoreViewModel<SignUpUiState, SignUpAction, 
     @Inject
     public SignUpViewModel(RegisterUseCase registerUseCase, SavedStateHandle savedStateHandle) {
         this.registerUseCase = registerUseCase;
-        state.setValue(new SignUpUiState.Input("", "", "", "", 1, null));
+        state.setValue(inputState("", "", "", "", 1, null));
     }
 
     @Override
@@ -31,15 +31,15 @@ public class SignUpViewModel extends CoreViewModel<SignUpUiState, SignUpAction, 
         if (current == null) return;
 
         if (action instanceof SignUpAction.OnUsernameChanged) {
-            state.setValue(new SignUpUiState.Input(((SignUpAction.OnUsernameChanged) action).username, current.getEmail(), current.getPassword(), current.getConfirmPassword(), current.getAvatarId(), null));
+            state.setValue(inputState(((SignUpAction.OnUsernameChanged) action).username, current.getEmail(), current.getPassword(), current.getConfirmPassword(), current.getAvatarId(), null));
         } else if (action instanceof SignUpAction.OnEmailChanged) {
-            state.setValue(new SignUpUiState.Input(current.getUsername(), ((SignUpAction.OnEmailChanged) action).email, current.getPassword(), current.getConfirmPassword(), current.getAvatarId(), null));
+            state.setValue(inputState(current.getUsername(), ((SignUpAction.OnEmailChanged) action).email, current.getPassword(), current.getConfirmPassword(), current.getAvatarId(), null));
         } else if (action instanceof SignUpAction.OnPasswordChanged) {
-            state.setValue(new SignUpUiState.Input(current.getUsername(), current.getEmail(), ((SignUpAction.OnPasswordChanged) action).password, current.getConfirmPassword(), current.getAvatarId(), null));
+            state.setValue(inputState(current.getUsername(), current.getEmail(), ((SignUpAction.OnPasswordChanged) action).password, current.getConfirmPassword(), current.getAvatarId(), null));
         } else if (action instanceof SignUpAction.OnConfirmPasswordChanged) {
-            state.setValue(new SignUpUiState.Input(current.getUsername(), current.getEmail(), current.getPassword(), ((SignUpAction.OnConfirmPasswordChanged) action).confirmPassword, current.getAvatarId(), null));
+            state.setValue(inputState(current.getUsername(), current.getEmail(), current.getPassword(), ((SignUpAction.OnConfirmPasswordChanged) action).confirmPassword, current.getAvatarId(), null));
         } else if (action instanceof SignUpAction.OnAvatarSelected) {
-            state.setValue(new SignUpUiState.Input(current.getUsername(), current.getEmail(), current.getPassword(), current.getConfirmPassword(), ((SignUpAction.OnAvatarSelected) action).avatarId, null));
+            state.setValue(inputState(current.getUsername(), current.getEmail(), current.getPassword(), current.getConfirmPassword(), ((SignUpAction.OnAvatarSelected) action).avatarId, null));
         } else if (action instanceof SignUpAction.OnBackToLoginClicked) {
             sideEffect.setValue(new SignUpSideEffect.NavigateToLogin());
         } else if (action instanceof SignUpAction.OnRegisterClicked) {
@@ -48,10 +48,10 @@ public class SignUpViewModel extends CoreViewModel<SignUpUiState, SignUpAction, 
     }
 
     private void performRegister(SignUpUiState current) {
-        String validationError = validate(current);
+        ValidationError validationError = validate(current);
         if (validationError != null) {
-            state.setValue(new SignUpUiState.Input(current.getUsername(), current.getEmail(), current.getPassword(), current.getConfirmPassword(), current.getAvatarId(), validationError));
-            sideEffect.setValue(new SignUpSideEffect.ShowToast(validationError));
+            state.setValue(inputState(current.getUsername(), current.getEmail(), current.getPassword(), current.getConfirmPassword(), current.getAvatarId(), validationError));
+            sideEffect.setValue(new SignUpSideEffect.ShowToast(validationError.message));
             return;
         }
 
@@ -64,17 +64,48 @@ public class SignUpViewModel extends CoreViewModel<SignUpUiState, SignUpAction, 
                         sideEffect.setValue(new SignUpSideEffect.NavigateToLogin());
                     } else if (result instanceof Result.Error) {
                         String msg = ((Result.Error<Void>) result).message;
-                        state.setValue(new SignUpUiState.Input(current.getUsername(), current.getEmail(), current.getPassword(), current.getConfirmPassword(), current.getAvatarId(), msg));
+                        state.setValue(inputState(current.getUsername(), current.getEmail(), current.getPassword(), current.getConfirmPassword(), current.getAvatarId(), null));
                         sideEffect.setValue(new SignUpSideEffect.ShowToast(msg));
                     }
                 }));
     }
 
-    private String validate(SignUpUiState current) {
-        if (current.getUsername().trim().length() < 3) return "Korisničko ime mora imati bar 3 karaktera.";
-        if (!Patterns.EMAIL_ADDRESS.matcher(current.getEmail()).matches()) return "Email nije u dobrom formatu.";
-        if (current.getPassword().length() < 8) return "Lozinka mora imati bar 8 karaktera.";
-        if (!current.getPassword().equals(current.getConfirmPassword())) return "Lozinke se ne podudaraju.";
+    private ValidationError validate(SignUpUiState current) {
+        if (current.getUsername().trim().length() < 3) return new ValidationError(Field.USERNAME, "Korisničko ime mora imati bar 3 karaktera.");
+        if (!Patterns.EMAIL_ADDRESS.matcher(current.getEmail()).matches()) return new ValidationError(Field.EMAIL, "Email nije u dobrom formatu.");
+        if (current.getPassword().length() < 8) return new ValidationError(Field.PASSWORD, "Lozinka mora imati bar 8 karaktera.");
+        if (!current.getPassword().equals(current.getConfirmPassword())) return new ValidationError(Field.CONFIRM_PASSWORD, "Lozinke se ne podudaraju.");
         return null;
+    }
+
+    private SignUpUiState.Input inputState(String username, String email, String password, String confirmPassword, int avatarId, ValidationError error) {
+        return new SignUpUiState.Input(
+                username,
+                email,
+                password,
+                confirmPassword,
+                avatarId,
+                error != null && error.field == Field.USERNAME ? error.message : null,
+                error != null && error.field == Field.EMAIL ? error.message : null,
+                error != null && error.field == Field.PASSWORD ? error.message : null,
+                error != null && error.field == Field.CONFIRM_PASSWORD ? error.message : null
+        );
+    }
+
+    private enum Field {
+        USERNAME,
+        EMAIL,
+        PASSWORD,
+        CONFIRM_PASSWORD
+    }
+
+    private static class ValidationError {
+        private final Field field;
+        private final String message;
+
+        private ValidationError(Field field, String message) {
+            this.field = field;
+            this.message = message;
+        }
     }
 }

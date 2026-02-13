@@ -22,10 +22,27 @@ public abstract class SignUpUiState {
     public int getAvatarId() { return avatarId; }
 
     public static class Input extends SignUpUiState {
-        public final String error;
-        public Input(String username, String email, String password, String confirmPassword, int avatarId, String error) {
+        public final String usernameError;
+        public final String emailError;
+        public final String passwordError;
+        public final String confirmPasswordError;
+
+        public Input(
+                String username,
+                String email,
+                String password,
+                String confirmPassword,
+                int avatarId,
+                String usernameError,
+                String emailError,
+                String passwordError,
+                String confirmPasswordError
+        ) {
             super(username, email, password, confirmPassword, avatarId);
-            this.error = error;
+            this.usernameError = usernameError;
+            this.emailError = emailError;
+            this.passwordError = passwordError;
+            this.confirmPasswordError = confirmPasswordError;
         }
     }
 

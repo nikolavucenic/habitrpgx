@@ -1,13 +1,13 @@
 package com.example.habitrpg;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
@@ -37,6 +37,10 @@ public class MainActivity extends AppCompatActivity {
         if (navHostFragment != null) {
             NavController navController = navHostFragment.getNavController();
             NavigationUI.setupWithNavController(navView, navController);
+            navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+                boolean showBottomBar = destination.getId() == R.id.dashboardFragment;
+                navView.setVisibility(showBottomBar ? View.VISIBLE : View.GONE);
+            });
         }
     }
 }
