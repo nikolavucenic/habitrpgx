@@ -1,5 +1,6 @@
 package com.example.habitrpg;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 
@@ -9,15 +10,23 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.navigation.NavController;
+import androidx.navigation.NavGraph;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
+
+    private static final String KEY_IS_LOGGED_IN = "is_logged_in";
+
+    @Inject
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +45,11 @@ public class MainActivity extends AppCompatActivity {
 
         if (navHostFragment != null) {
             NavController navController = navHostFragment.getNavController();
+            NavGraph navGraph = navController.getNavInflater().inflate(R.navigation.nav_graph);
+            boolean isLoggedIn = sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false);
+            navGraph.setStartDestination(isLoggedIn ? R.id.nav_profile : R.id.auth_graph);
+            navController.setGraph(navGraph);
+
             NavigationUI.setupWithNavController(navView, navController);
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
                 int id = destination.getId();

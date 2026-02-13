@@ -1,5 +1,7 @@
 package com.example.data.repository;
 
+import android.content.SharedPreferences;
+
 import com.example.domain.core.Result;
 import com.example.domain.model.User;
 import com.example.domain.repository.AuthRepository;
@@ -21,11 +23,15 @@ import javax.inject.Singleton;
 public class AuthRepositoryImpl implements AuthRepository {
     private final FirebaseAuth mAuth;
     private final FirebaseFirestore mDb;
+    private final SharedPreferences sharedPreferences;
+
+    private static final String KEY_IS_LOGGED_IN = "is_logged_in";
 
     @Inject
-    public AuthRepositoryImpl() {
+    public AuthRepositoryImpl(SharedPreferences sharedPreferences) {
         this.mAuth = FirebaseAuth.getInstance();
         this.mDb = FirebaseFirestore.getInstance();
+        this.sharedPreferences = sharedPreferences;
     }
 
     @Override
@@ -35,6 +41,7 @@ public class AuthRepositoryImpl implements AuthRepository {
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(authTask -> {
             if (!authTask.isSuccessful()) {
                 String error = authTask.getException() != null ? authTask.getException().getMessage() : "Greška pri registraciji.";
+                sharedPreferences.edit().putBoolean(KEY_IS_LOGGED_IN, false).apply();
                 future.complete(new Result.Error<>(error));
                 return;
             }
@@ -63,6 +70,7 @@ public class AuthRepositoryImpl implements AuthRepository {
                             .addOnCompleteListener(mailTask -> {
                                 if (mailTask.isSuccessful()) {
                                     mAuth.signOut();
+                                    sharedPreferences.edit().putBoolean(KEY_IS_LOGGED_IN, false).apply();
                                     future.complete(new Result.Success<>(null));
                                 } else {
                                     String mailError = mailTask.getException() != null ? mailTask.getException().getMessage() : "Nije moguće poslati verifikacioni email.";
@@ -82,18 +90,22 @@ public class AuthRepositoryImpl implements AuthRepository {
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(authTask -> {
             if (!authTask.isSuccessful()) {
                 String error = authTask.getException() != null ? authTask.getException().getMessage() : "Greška pri prijavi.";
+                sharedPreferences.edit().putBoolean(KEY_IS_LOGGED_IN, false).apply();
                 future.complete(new Result.Error<>(error));
                 return;
             }
 
             FirebaseUser fbUser = mAuth.getCurrentUser();
             if (fbUser == null) {
+                sharedPreferences.edit().putBoolean(KEY_IS_LOGGED_IN, false).apply();
                 future.complete(new Result.Error<>("Korisnik nije pronađen."));
                 return;
             }
 
             fbUser.reload().addOnCompleteListener(reloadTask -> {
                 if (!fbUser.isEmailVerified()) {
+                    sharedPreferences.edit().putBoolean(KEY_IS_LOGGED_IN, false).apply();
+                    mAuth.signOut();
                     future.complete(new Result.Error<>("Nalog nije aktiviran. Proverite email."));
                     return;
                 }
@@ -102,12 +114,15 @@ public class AuthRepositoryImpl implements AuthRepository {
                     if (dbTask.isSuccessful() && dbTask.getResult().exists()) {
                         Map<String, Object> doc = dbTask.getResult().getData();
                         if (doc == null) {
+                            sharedPreferences.edit().putBoolean(KEY_IS_LOGGED_IN, false).apply();
                             future.complete(new Result.Error<>("Podaci o korisniku nisu dostupni."));
                             return;
                         }
                         User user = mapToUser(doc);
+                        sharedPreferences.edit().putBoolean(KEY_IS_LOGGED_IN, true).apply();
                         future.complete(new Result.Success<>(user));
                     } else {
+                        sharedPreferences.edit().putBoolean(KEY_IS_LOGGED_IN, false).apply();
                         future.complete(new Result.Error<>("Podaci o RPG profilu ne postoje."));
                     }
                 });
@@ -120,6 +135,7 @@ public class AuthRepositoryImpl implements AuthRepository {
     @Override
     public CompletableFuture<Result<Void>> logout() {
         mAuth.signOut();
+        sharedPreferences.edit().putBoolean(KEY_IS_LOGGED_IN, false).apply();
         return CompletableFuture.completedFuture(new Result.Success<>(null));
     }
 
@@ -129,6 +145,7 @@ public class AuthRepositoryImpl implements AuthRepository {
         FirebaseUser current = mAuth.getCurrentUser();
 
         if (current == null) {
+            sharedPreferences.edit().putBoolean(KEY_IS_LOGGED_IN, false).apply();
             future.complete(new Result.Error<>("Nema aktivnog korisnika."));
             return future;
         }
