@@ -26,6 +26,25 @@
     <string name="alliance">Savez</string>
     <string name="progression_tab">Napredovanje</string>
 
+
+    <string name="profile_title">Profil korisnika</string>
+    <string name="profile_avatar_content_description">Avatar korisnika</string>
+    <string name="profile_level_value">Nivo: %1$d</string>
+    <string name="profile_title_value">Titula: %1$s</string>
+    <string name="profile_pp_value">PP: %1$d</string>
+    <string name="profile_xp_value">XP: %1$d</string>
+    <string name="profile_coins_value">Novčići: %1$d</string>
+    <string name="profile_badges_value">Bedževi (%1$d): %2$s</string>
+    <string name="profile_equipment_value">Oprema: %1$s</string>
+    <string name="profile_qr_content_description">QR kod korisnika</string>
+    <string name="profile_private_data_title">Privatni podaci (vidljivi samo vama)</string>
+    <string name="profile_change_password_title">Promena lozinke</string>
+    <string name="profile_old_password">Stara lozinka</string>
+    <string name="profile_new_password">Nova lozinka</string>
+    <string name="profile_confirm_new_password">Potvrdi novu lozinku</string>
+    <string name="profile_change_password_button">Promeni lozinku</string>
+    <string name="profile_logout">Log out</string>
+
     <string name="progression_title">Napredovanje kroz nivoe</string>
     <string name="progression_hero_title">%1$s • %2$s</string>
     <string name="progression_avatar_content_description">Izabrani avatar heroja</string>
