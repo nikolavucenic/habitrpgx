@@ -7,17 +7,41 @@
 
     <include app:graph="@navigation/auth_graph">
         <action
-            android:id="@+id/action_auth_to_dashboard"
-            app:destination="@id/dashboardFragment"
+            android:id="@+id/action_auth_to_profile"
+            app:destination="@id/nav_profile"
             app:launchSingleTop="true"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
     </include>
 
     <fragment
-        android:id="@+id/dashboardFragment"
-        android:name="com.example.habitrpg.DashboardFragment"
-        android:label="fragment_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/nav_profile"
+        android:name="com.example.habitrpg.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/nav_tasks"
+        android:name="com.example.habitrpg.TasksFragment"
+        android:label="fragment_tasks"
+        tools:layout="@layout/fragment_tasks" />
+
+    <fragment
+        android:id="@+id/nav_shop"
+        android:name="com.example.habitrpg.ShopFragment"
+        android:label="fragment_shop"
+        tools:layout="@layout/fragment_shop" />
+
+    <fragment
+        android:id="@+id/nav_social"
+        android:name="com.example.habitrpg.SocialFragment"
+        android:label="fragment_social"
+        tools:layout="@layout/fragment_social" />
+
+    <fragment
+        android:id="@+id/nav_progression"
+        android:name="com.example.habitrpg.ProgressionFragment"
+        android:label="fragment_progression"
+        tools:layout="@layout/fragment_progression" />
 
 </navigation>
