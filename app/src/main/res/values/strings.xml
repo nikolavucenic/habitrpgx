@@ -28,6 +28,7 @@
 
     <string name="progression_title">Napredovanje kroz nivoe</string>
     <string name="progression_hero_title">%1$s • %2$s</string>
+    <string name="progression_avatar_content_description">Izabrani avatar heroja</string>
     <string name="progression_level_value">Nivo: %1$d</string>
     <string name="progression_pp_value">PP: %1$d</string>
     <string name="progression_xp_value">XP: %1$d / %2$d</string>

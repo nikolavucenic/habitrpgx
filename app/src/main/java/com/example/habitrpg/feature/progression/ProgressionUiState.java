@@ -4,6 +4,7 @@ public class ProgressionUiState {
     public final String username;
     public final String title;
     public final int level;
+    public final int avatarId;
     public final int pp;
     public final int currentXp;
     public final int requiredXp;
@@ -14,6 +15,7 @@ public class ProgressionUiState {
     public ProgressionUiState(String username,
                               String title,
                               int level,
+                              int avatarId,
                               int pp,
                               int currentXp,
                               int requiredXp,
@@ -23,6 +25,7 @@ public class ProgressionUiState {
         this.username = username;
         this.title = title;
         this.level = level;
+        this.avatarId = avatarId;
         this.pp = pp;
         this.currentXp = currentXp;
         this.requiredXp = requiredXp;
@@ -32,6 +35,6 @@ public class ProgressionUiState {
     }
 
     public static ProgressionUiState initial() {
-        return new ProgressionUiState("Heroj", "Početnik navika", 1, 0, 0, 200, "", "", null);
+        return new ProgressionUiState("Heroj", "Početnik navika", 1, 1, 0, 0, 200, "", "", null);
     }
 }

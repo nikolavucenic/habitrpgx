@@ -34,6 +34,7 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
             getBinding().progressXp.setMax(Math.max(1, state.requiredXp));
             getBinding().progressXp.setProgress(Math.min(state.currentXp, state.requiredXp));
 
+            getBinding().ivAvatar.setImageResource(getAvatarDrawable(state.avatarId));
             getBinding().tvHeroNameTitle.setText(getString(R.string.progression_hero_title, state.username, state.title));
             getBinding().tvLevel.setText(getString(R.string.progression_level_value, state.level));
             getBinding().tvPp.setText(getString(R.string.progression_pp_value, state.pp));
@@ -52,5 +53,13 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
         });
 
         viewModel.load();
+    }
+
+    private int getAvatarDrawable(int avatarId) {
+        if (avatarId == 2) return R.drawable.avatar_2;
+        if (avatarId == 3) return R.drawable.avatar_3;
+        if (avatarId == 4) return R.drawable.avatar_4;
+        if (avatarId == 5) return R.drawable.avatar_5;
+        return R.drawable.avatar_1;
     }
 }
