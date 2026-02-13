@@ -1,10 +1,11 @@
 package com.example.habitrpg.feature;
 
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -43,7 +44,16 @@ public class SignUpFragment extends CoreFragment<FragmentSignUpBinding> {
             getBinding().btnRegister.setEnabled(!isLoading);
             getBinding().btnBackToLogin.setEnabled(!isLoading);
             if (state instanceof SignUpUiState.Input) {
-                getBinding().tilUsername.setError(((SignUpUiState.Input) state).error);
+                SignUpUiState.Input inputState = (SignUpUiState.Input) state;
+                getBinding().tilUsername.setError(inputState.usernameError);
+                getBinding().tilEmail.setError(inputState.emailError);
+                getBinding().tilPassword.setError(inputState.passwordError);
+                getBinding().tilPasswordConfirm.setError(inputState.confirmPasswordError);
+
+                int checkedAvatarId = getAvatarButtonId(inputState.getAvatarId());
+                if (checkedAvatarId != -1 && getBinding().rgAvatars.getCheckedRadioButtonId() != checkedAvatarId) {
+                    getBinding().rgAvatars.check(checkedAvatarId);
+                }
             }
         });
 
@@ -64,6 +74,17 @@ public class SignUpFragment extends CoreFragment<FragmentSignUpBinding> {
         getBinding().btnRegister.setOnClickListener(v -> viewModel.handleAction(new SignUpAction.OnRegisterClicked()));
         getBinding().btnBackToLogin.setOnClickListener(v -> viewModel.handleAction(new SignUpAction.OnBackToLoginClicked()));
 
+        getBinding().etUsername.setOnEditorActionListener((v, actionId, event) -> handleNextAction(actionId, event, getBinding().etEmail));
+        getBinding().etEmail.setOnEditorActionListener((v, actionId, event) -> handleNextAction(actionId, event, getBinding().etPassword));
+        getBinding().etPassword.setOnEditorActionListener((v, actionId, event) -> handleNextAction(actionId, event, getBinding().etPasswordConfirm));
+        getBinding().etPasswordConfirm.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+                viewModel.handleAction(new SignUpAction.OnRegisterClicked());
+                return true;
+            }
+            return false;
+        });
+
         getBinding().rgAvatars.setOnCheckedChangeListener((group, checkedId) -> {
             int avatarId = 1;
             if (checkedId == R.id.avatar2) avatarId = 2;
@@ -72,5 +93,22 @@ public class SignUpFragment extends CoreFragment<FragmentSignUpBinding> {
             else if (checkedId == R.id.avatar5) avatarId = 5;
             viewModel.handleAction(new SignUpAction.OnAvatarSelected(avatarId));
         });
+    }
+
+    private boolean handleNextAction(int actionId, KeyEvent event, View nextView) {
+        if (actionId == EditorInfo.IME_ACTION_NEXT || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+            nextView.requestFocus();
+            return true;
+        }
+        return false;
+    }
+
+    private int getAvatarButtonId(int avatarId) {
+        if (avatarId == 1) return R.id.avatar1;
+        if (avatarId == 2) return R.id.avatar2;
+        if (avatarId == 3) return R.id.avatar3;
+        if (avatarId == 4) return R.id.avatar4;
+        if (avatarId == 5) return R.id.avatar5;
+        return -1;
     }
 }
