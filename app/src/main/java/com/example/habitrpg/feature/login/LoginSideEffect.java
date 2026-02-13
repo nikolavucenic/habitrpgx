@@ -1,4 +1,4 @@
-package com.example.habitrpg.feature;
+package com.example.habitrpg.feature.login;
 
 public abstract class LoginSideEffect {
     public static class NavigateToHome extends LoginSideEffect {}

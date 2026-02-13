@@ -140,7 +140,7 @@
                     android:button="@null"
                     android:checked="true"
                     android:drawablePadding="6dp"
-                    android:drawableTop="@drawable/ic_user"
+                    android:drawableTop="@drawable/avatar_1_scaled"
                     android:elevation="2dp"
                     android:gravity="center" />
 
@@ -152,7 +152,7 @@
                     android:background="@drawable/avatar_option_background"
                     android:button="@null"
                     android:drawablePadding="6dp"
-                    android:drawableTop="@drawable/ic_profile"
+                    android:drawableTop="@drawable/avatar_2_scaled"
                     android:elevation="2dp"
                     android:gravity="center" />
 
@@ -164,7 +164,7 @@
                     android:background="@drawable/avatar_option_background"
                     android:button="@null"
                     android:drawablePadding="6dp"
-                    android:drawableTop="@drawable/ic_user"
+                    android:drawableTop="@drawable/avatar_3_scaled"
                     android:elevation="2dp"
                     android:gravity="center" />
 
@@ -176,7 +176,7 @@
                     android:background="@drawable/avatar_option_background"
                     android:button="@null"
                     android:drawablePadding="6dp"
-                    android:drawableTop="@drawable/ic_profile"
+                    android:drawableTop="@drawable/avatar_4_scaled"
                     android:elevation="2dp"
                     android:gravity="center" />
 
@@ -187,7 +187,7 @@
                     android:background="@drawable/avatar_option_background"
                     android:button="@null"
                     android:drawablePadding="6dp"
-                    android:drawableTop="@drawable/ic_user"
+                    android:drawableTop="@drawable/avatar_5_scaled"
                     android:elevation="2dp"
                     android:gravity="center" />
 

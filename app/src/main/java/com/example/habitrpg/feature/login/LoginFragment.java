@@ -1,4 +1,4 @@
-package com.example.habitrpg.feature;
+package com.example.habitrpg.feature.login;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
@@ -42,6 +41,7 @@ public class LoginFragment extends CoreFragment<FragmentLoginBinding> {
             if (state instanceof LoginUiState.Input) {
                 LoginUiState.Input inputState = (LoginUiState.Input) state;
                 getBinding().tilEmail.setError(inputState.getEmailError());
+                getBinding().tilPassword.setError(inputState.getPasswordError());
                 getBinding().loadingOverlay.setVisibility(View.GONE);
                 getBinding().btnLogin.setEnabled(true);
             }
@@ -50,7 +50,10 @@ public class LoginFragment extends CoreFragment<FragmentLoginBinding> {
                 getBinding().btnLogin.setEnabled(false);
             }
             else if (state instanceof LoginUiState.Error) {
+                LoginUiState.Error errorState = (LoginUiState.Error) state;
                 getBinding().loadingOverlay.setVisibility(View.GONE);
+                getBinding().tilEmail.setError(errorState.getEmailError());
+                getBinding().tilPassword.setError(errorState.getPasswordError());
                 getBinding().btnLogin.setEnabled(true);
             }
         });

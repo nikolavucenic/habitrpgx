@@ -1,4 +1,4 @@
-package com.example.habitrpg.feature;
+package com.example.habitrpg.feature.login;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -22,7 +22,7 @@ public class LoginViewModel extends CoreViewModel<LoginUiState, LoginAction, Log
     @Inject
     public LoginViewModel(LoginUseCase loginUseCase, SavedStateHandle savedStateHandle) {
         this.loginUseCase = loginUseCase;
-        state.setValue(new LoginUiState.Input("", "", null));
+        state.setValue(new LoginUiState.Input("", "", null, null));
     }
 
     @Override
@@ -31,9 +31,9 @@ public class LoginViewModel extends CoreViewModel<LoginUiState, LoginAction, Log
         if (current == null) return;
 
         if (action instanceof LoginAction.OnEmailChanged) {
-            state.setValue(new LoginUiState.Input(((LoginAction.OnEmailChanged) action).email, current.getPassword(), null));
+            state.setValue(new LoginUiState.Input(((LoginAction.OnEmailChanged) action).email, current.getPassword(), null, null));
         } else if (action instanceof LoginAction.OnPasswordChanged) {
-            state.setValue(new LoginUiState.Input(current.getEmail(), ((LoginAction.OnPasswordChanged) action).password, null));
+            state.setValue(new LoginUiState.Input(current.getEmail(), ((LoginAction.OnPasswordChanged) action).password, null, null));
         } else if (action instanceof LoginAction.OnLoginClicked) {
             performLogin(current);
         } else if (action instanceof LoginAction.OnGoToRegisterClicked) {
@@ -42,7 +42,20 @@ public class LoginViewModel extends CoreViewModel<LoginUiState, LoginAction, Log
     }
 
     private void performLogin(LoginUiState current) {
-        state.setValue(new LoginUiState.Loading(current.getEmail(), current.getPassword()));
+        String email = current.getEmail().trim();
+        String password = current.getPassword().trim();
+
+        if (email.isEmpty() || password.isEmpty()) {
+            state.setValue(new LoginUiState.Input(
+                    email,
+                    password,
+                    email.isEmpty() ? "Email je obavezan" : null,
+                    password.isEmpty() ? "Lozinka je obavezna" : null
+            ));
+            return;
+        }
+
+        state.setValue(new LoginUiState.Loading(email, password));
 
         loginUseCase.execute(current.getEmail(), current.getPassword())
                 .thenAccept(result -> {
@@ -51,7 +64,7 @@ public class LoginViewModel extends CoreViewModel<LoginUiState, LoginAction, Log
                             sideEffect.setValue(new LoginSideEffect.NavigateToHome());
                         } else if (result instanceof Result.Error) {
                             String msg = ((Result.Error<User>) result).message;
-                            state.setValue(new LoginUiState.Error(current.getEmail(), current.getPassword(), msg));
+                            state.setValue(new LoginUiState.Error(current.getEmail(), current.getPassword(), null, null));
                             sideEffect.setValue(new LoginSideEffect.ShowToast(msg));
                         }
                     });

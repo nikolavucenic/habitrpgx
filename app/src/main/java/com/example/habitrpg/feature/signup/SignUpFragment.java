@@ -1,4 +1,4 @@
-package com.example.habitrpg.feature;
+package com.example.habitrpg.feature.signup;
 
 import android.os.Bundle;
 import android.view.KeyEvent;

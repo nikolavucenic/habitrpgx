@@ -1,4 +1,4 @@
-package com.example.habitrpg.feature;
+package com.example.habitrpg.feature.login;
 
 public abstract class LoginAction {
     public static class OnEmailChanged extends LoginAction {

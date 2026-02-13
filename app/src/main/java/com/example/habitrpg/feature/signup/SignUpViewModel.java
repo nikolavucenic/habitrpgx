@@ -1,4 +1,4 @@
-package com.example.habitrpg.feature;
+package com.example.habitrpg.feature.signup;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -51,7 +51,6 @@ public class SignUpViewModel extends CoreViewModel<SignUpUiState, SignUpAction, 
         ValidationError validationError = validate(current);
         if (validationError != null) {
             state.setValue(inputState(current.getUsername(), current.getEmail(), current.getPassword(), current.getConfirmPassword(), current.getAvatarId(), validationError));
-            sideEffect.setValue(new SignUpSideEffect.ShowToast(validationError.message));
             return;
         }
 

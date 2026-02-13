@@ -1,4 +1,4 @@
-package com.example.habitrpg.feature;
+package com.example.habitrpg.feature.signup;
 
 public abstract class SignUpUiState {
     private final String username;

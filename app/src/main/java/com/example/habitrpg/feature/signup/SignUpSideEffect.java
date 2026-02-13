@@ -1,4 +1,4 @@
-package com.example.habitrpg.feature;
+package com.example.habitrpg.feature.signup;
 
 public abstract class SignUpSideEffect {
     public static class ShowToast extends SignUpSideEffect {

@@ -1,4 +1,4 @@
-package com.example.habitrpg.feature;
+package com.example.habitrpg.feature.signup;
 
 public abstract class SignUpAction {
     public static class OnUsernameChanged extends SignUpAction { public final String username; public OnUsernameChanged(String username) { this.username = username; } }
