@@ -1,4 +1,4 @@
-package com.example.habitrpg;
+package com.example.habitrpg.feature.profile;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;

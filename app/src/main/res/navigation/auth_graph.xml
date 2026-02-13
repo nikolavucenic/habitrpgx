@@ -12,6 +12,13 @@
         tools:layout="@layout/fragment_login">
 
         <action
+            android:id="@+id/action_auth_to_profile"
+            app:destination="@id/nav_profile"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+
+        <action
             android:id="@+id/action_loginFragment_to_signUpFragment"
             app:destination="@id/signUpFragment"
             app:enterAnim="@anim/nav_default_enter_anim"

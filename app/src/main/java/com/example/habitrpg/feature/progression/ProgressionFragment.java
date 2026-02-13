@@ -1,4 +1,4 @@
-package com.example.habitrpg;
+package com.example.habitrpg.feature.progression;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,9 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.habitrpg.R;
 import com.example.habitrpg.core.CoreFragment;
 import com.example.habitrpg.databinding.FragmentProgressionBinding;
-import com.example.habitrpg.feature.progression.ProgressionViewModel;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
