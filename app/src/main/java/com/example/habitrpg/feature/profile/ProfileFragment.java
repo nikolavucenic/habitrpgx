@@ -102,10 +102,9 @@ public class ProfileFragment extends CoreFragment<FragmentProfileBinding> {
         getBinding().tvBadges.setText(getString(R.string.profile_badges_value, user.badges.size(), formatList(user.badges)));
         getBinding().tvEquipment.setText(getString(R.string.profile_equipment_value, formatList(user.equipment)));
 
-        Bitmap qrBitmap = generateQrCode(user.uid + ":" + user.username);
-        if (qrBitmap != null) {
+        Bitmap qrBitmap = generateQrCode(user.uid);
+        if (qrBitmap != null)
             getBinding().ivQrCode.setImageBitmap(qrBitmap);
-        }
     }
 
     private String formatList(java.util.List<String> values) {
