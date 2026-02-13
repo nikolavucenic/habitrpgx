@@ -15,4 +15,8 @@
         android:id="@+id/nav_social"
         android:icon="@drawable/ic_social"
         android:title="@string/alliance" />
+    <item
+        android:id="@+id/nav_progression"
+        android:icon="@drawable/ic_progression"
+        android:title="@string/progression_tab" />
 </menu>

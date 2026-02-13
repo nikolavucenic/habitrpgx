@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
             NavController navController = navHostFragment.getNavController();
             NavigationUI.setupWithNavController(navView, navController);
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-                boolean showBottomBar = destination.getId() == R.id.dashboardFragment;
+                int id = destination.getId();
+                boolean showBottomBar = id == R.id.nav_profile || id == R.id.nav_tasks || id == R.id.nav_shop || id == R.id.nav_social || id == R.id.nav_progression;
                 navView.setVisibility(showBottomBar ? View.VISIBLE : View.GONE);
             });
         }

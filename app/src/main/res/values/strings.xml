@@ -22,6 +22,16 @@
     <string name="tasks">Zadaci</string>
     <string name="shop">Prodavnica</string>
     <string name="alliance">Savez</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="progression_tab">Napredovanje</string>
+    <string name="profile_intro">Ovde se prikazuje profil heroja. Napredovanje je prebačeno u poseban tab.</string>
+
+    <string name="progression_title">Napredovanje kroz nivoe</string>
+    <string name="progression_hero_title">%1$s • %2$s</string>
+    <string name="progression_level_value">Nivo: %1$d</string>
+    <string name="progression_pp_value">PP: %1$d</string>
+    <string name="progression_xp_value">XP: %1$d / %2$d</string>
+    <string name="progression_xp_needed_value">Potrebno još %1$d XP za sledeći nivo</string>
+    <string name="progression_importance_title">XP po bitnosti zadatka</string>
+    <string name="progression_difficulty_title">XP po težini zadatka</string>
+    <string name="progression_error_value">Napomena: %1$s</string>
 </resources>

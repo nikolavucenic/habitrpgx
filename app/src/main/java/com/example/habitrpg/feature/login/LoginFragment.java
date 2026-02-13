@@ -60,7 +60,7 @@ public class LoginFragment extends CoreFragment<FragmentLoginBinding> {
 
         viewModel.getEffect().observe(getViewLifecycleOwner(), effect -> {
             if (effect instanceof LoginSideEffect.NavigateToHome) {
-                Navigation.findNavController(requireView()).navigate(R.id.action_auth_to_dashboard);
+                Navigation.findNavController(requireView()).navigate(R.id.action_auth_to_profile);
             }
             else if (effect instanceof LoginSideEffect.NavigateToRegister) {
                 Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_signUpFragment);
