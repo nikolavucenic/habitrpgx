@@ -44,28 +44,42 @@ public class ProfileFragment extends CoreFragment<FragmentProfileBinding> {
 
     private void setupObservers() {
         viewModel.getState().observe(getViewLifecycleOwner(), state -> {
-            getBinding().loadingOverlay.setVisibility(state.loading ? View.VISIBLE : View.GONE);
+            getBinding().loadingOverlay.setVisibility(state instanceof ProfileUiState.Loading ? View.VISIBLE : View.GONE);
 
-            getBinding().tilOldPassword.setError(state.oldPasswordError);
-            getBinding().tilNewPassword.setError(state.newPasswordError);
-            getBinding().tilConfirmPassword.setError(state.confirmPasswordError);
+            String oldPasswordError = null;
+            String newPasswordError = null;
+            String confirmPasswordError = null;
+            String globalError = null;
 
-            if (!getBinding().etOldPassword.getText().toString().equals(state.oldPassword)) {
-                getBinding().etOldPassword.setText(state.oldPassword);
-            }
-            if (!getBinding().etNewPassword.getText().toString().equals(state.newPassword)) {
-                getBinding().etNewPassword.setText(state.newPassword);
-            }
-            if (!getBinding().etConfirmPassword.getText().toString().equals(state.confirmPassword)) {
-                getBinding().etConfirmPassword.setText(state.confirmPassword);
-            }
-
-            if (state.user != null) {
-                bindUser(state.user);
+            if (state instanceof ProfileUiState.Input) {
+                ProfileUiState.Input inputState = (ProfileUiState.Input) state;
+                oldPasswordError = inputState.getOldPasswordError();
+                newPasswordError = inputState.getNewPasswordError();
+                confirmPasswordError = inputState.getConfirmPasswordError();
+            } else if (state instanceof ProfileUiState.Error) {
+                globalError = ((ProfileUiState.Error) state).getMessage();
             }
 
-            getBinding().tvError.setVisibility(state.error == null ? View.GONE : View.VISIBLE);
-            getBinding().tvError.setText(state.error);
+            getBinding().tilOldPassword.setError(oldPasswordError);
+            getBinding().tilNewPassword.setError(newPasswordError);
+            getBinding().tilConfirmPassword.setError(confirmPasswordError);
+
+            if (!getBinding().etOldPassword.getText().toString().equals(state.getOldPassword())) {
+                getBinding().etOldPassword.setText(state.getOldPassword());
+            }
+            if (!getBinding().etNewPassword.getText().toString().equals(state.getNewPassword())) {
+                getBinding().etNewPassword.setText(state.getNewPassword());
+            }
+            if (!getBinding().etConfirmPassword.getText().toString().equals(state.getConfirmPassword())) {
+                getBinding().etConfirmPassword.setText(state.getConfirmPassword());
+            }
+
+            if (state.getUser() != null) {
+                bindUser(state.getUser());
+            }
+
+            getBinding().tvError.setVisibility(globalError == null ? View.GONE : View.VISIBLE);
+            getBinding().tvError.setText(globalError);
         });
 
         viewModel.getEffect().observe(getViewLifecycleOwner(), effect -> {

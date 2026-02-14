@@ -22,7 +22,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 public class ProgressionViewModel extends ViewModel {
 
     private final GetCurrentUserProfileUseCase getCurrentUserProfileUseCase;
-    private final MutableLiveData<ProgressionUiState> state = new MutableLiveData<>(ProgressionUiState.initial());
+    private final MutableLiveData<ProgressionUiState> state =
+            new MutableLiveData<>(new ProgressionUiState.Loading(ProgressionUiState.initialData()));
 
     @Inject
     public ProgressionViewModel(GetCurrentUserProfileUseCase getCurrentUserProfileUseCase) {
@@ -34,35 +35,28 @@ public class ProgressionViewModel extends ViewModel {
     }
 
     public void load() {
+        ProgressionUiState current = state.getValue();
+        ProgressionUiState.Data currentData = current != null ? current.getData() : ProgressionUiState.initialData();
+        state.setValue(new ProgressionUiState.Loading(currentData));
+
         getCurrentUserProfileUseCase.execute().thenAccept(result ->
                 new Handler(Looper.getMainLooper()).post(() -> {
                     if (result instanceof Result.Success) {
-                        bindUser(((Result.Success<User>) result).data);
+                        state.setValue(new ProgressionUiState.Success(toData(((Result.Success<User>) result).data)));
                     } else if (result instanceof Result.Error) {
-                        ProgressionUiState fallback = ProgressionUiState.initial();
-                        state.setValue(new ProgressionUiState(
-                                fallback.username,
-                                fallback.title,
-                                fallback.level,
-                                fallback.avatarId,
-                                fallback.pp,
-                                fallback.currentXp,
-                                fallback.requiredXp,
-                                formatPreview(ProgressionCalculator.importanceXpByPassedLevel(0)),
-                                formatPreview(ProgressionCalculator.difficultyXpByPassedLevel(0)),
-                                ((Result.Error<User>) result).message
-                        ));
+                        ProgressionUiState.Data fallback = currentData;
+                        state.setValue(new ProgressionUiState.Error(fallback, ((Result.Error<User>) result).message));
                     }
                 })
         );
     }
 
-    private void bindUser(User user) {
+    private ProgressionUiState.Data toData(User user) {
         int passedLevels = Math.max(0, user.level - 1);
         int requiredXp = ProgressionCalculator.requiredXpForLevel(user.level);
         int pp = Math.max(user.pp, 0);
 
-        state.setValue(new ProgressionUiState(
+        return new ProgressionUiState.Data(
                 user.username,
                 ProgressionCalculator.titleForLevel(user.level),
                 user.level,
@@ -71,9 +65,8 @@ public class ProgressionViewModel extends ViewModel {
                 Math.max(user.xp, 0),
                 requiredXp,
                 formatPreview(ProgressionCalculator.importanceXpByPassedLevel(passedLevels)),
-                formatPreview(ProgressionCalculator.difficultyXpByPassedLevel(passedLevels)),
-                null
-        ));
+                formatPreview(ProgressionCalculator.difficultyXpByPassedLevel(passedLevels))
+        );
     }
 
     private String formatPreview(Map<String, Integer> values) {

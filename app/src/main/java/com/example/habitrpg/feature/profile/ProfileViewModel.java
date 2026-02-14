@@ -28,7 +28,7 @@ public class ProfileViewModel extends CoreViewModel<ProfileUiState, ProfileActio
         this.getCurrentUserProfileUseCase = getCurrentUserProfileUseCase;
         this.changePasswordUseCase = changePasswordUseCase;
         this.logoutUseCase = logoutUseCase;
-        state.setValue(ProfileUiState.initial());
+        state.setValue(new ProfileUiState.Loading(null, "", "", ""));
     }
 
     @Override
@@ -39,23 +39,35 @@ public class ProfileViewModel extends CoreViewModel<ProfileUiState, ProfileActio
         if (action instanceof ProfileAction.LoadProfile) {
             loadProfile(current);
         } else if (action instanceof ProfileAction.OnOldPasswordChanged) {
-            state.setValue(current.copy(false, current.user,
+            state.setValue(new ProfileUiState.Input(
+                    current.getUser(),
                     ((ProfileAction.OnOldPasswordChanged) action).value,
-                    current.newPassword,
-                    current.confirmPassword,
-                    null, current.newPasswordError, current.confirmPasswordError, current.error));
+                    current.getNewPassword(),
+                    current.getConfirmPassword(),
+                    null,
+                    null,
+                    null
+            ));
         } else if (action instanceof ProfileAction.OnNewPasswordChanged) {
-            state.setValue(current.copy(false, current.user,
-                    current.oldPassword,
+            state.setValue(new ProfileUiState.Input(
+                    current.getUser(),
+                    current.getOldPassword(),
                     ((ProfileAction.OnNewPasswordChanged) action).value,
-                    current.confirmPassword,
-                    current.oldPasswordError, null, current.confirmPasswordError, current.error));
+                    current.getConfirmPassword(),
+                    null,
+                    null,
+                    null
+            ));
         } else if (action instanceof ProfileAction.OnConfirmPasswordChanged) {
-            state.setValue(current.copy(false, current.user,
-                    current.oldPassword,
-                    current.newPassword,
+            state.setValue(new ProfileUiState.Input(
+                    current.getUser(),
+                    current.getOldPassword(),
+                    current.getNewPassword(),
                     ((ProfileAction.OnConfirmPasswordChanged) action).value,
-                    current.oldPasswordError, current.newPasswordError, null, current.error));
+                    null,
+                    null,
+                    null
+            ));
         } else if (action instanceof ProfileAction.OnChangePasswordClicked) {
             submitChangePassword(current);
         } else if (action instanceof ProfileAction.OnLogoutClicked) {
@@ -64,9 +76,12 @@ public class ProfileViewModel extends CoreViewModel<ProfileUiState, ProfileActio
     }
 
     private void loadProfile(ProfileUiState current) {
-        state.setValue(current.copy(true, current.user,
-                current.oldPassword, current.newPassword, current.confirmPassword,
-                current.oldPasswordError, current.newPasswordError, current.confirmPasswordError, null));
+        state.setValue(new ProfileUiState.Loading(
+                current.getUser(),
+                current.getOldPassword(),
+                current.getNewPassword(),
+                current.getConfirmPassword()
+        ));
 
         getCurrentUserProfileUseCase.execute().thenAccept(result ->
                 new Handler(Looper.getMainLooper()).post(() -> {
@@ -74,21 +89,31 @@ public class ProfileViewModel extends CoreViewModel<ProfileUiState, ProfileActio
                     if (latest == null) return;
 
                     if (result instanceof Result.Success) {
-                        state.setValue(latest.copy(false, ((Result.Success<User>) result).data,
-                                latest.oldPassword, latest.newPassword, latest.confirmPassword,
-                                null, null, null, null));
+                        state.setValue(new ProfileUiState.Input(
+                                ((Result.Success<User>) result).data,
+                                latest.getOldPassword(),
+                                latest.getNewPassword(),
+                                latest.getConfirmPassword(),
+                                null,
+                                null,
+                                null
+                        ));
                     } else if (result instanceof Result.Error) {
-                        state.setValue(latest.copy(false, latest.user,
-                                latest.oldPassword, latest.newPassword, latest.confirmPassword,
-                                null, null, null, ((Result.Error<User>) result).message));
+                        state.setValue(new ProfileUiState.Error(
+                                latest.getUser(),
+                                latest.getOldPassword(),
+                                latest.getNewPassword(),
+                                latest.getConfirmPassword(),
+                                ((Result.Error<User>) result).message
+                        ));
                     }
                 }));
     }
 
     private void submitChangePassword(ProfileUiState current) {
-        String oldPassword = current.oldPassword.trim();
-        String newPassword = current.newPassword.trim();
-        String confirmPassword = current.confirmPassword.trim();
+        String oldPassword = current.getOldPassword().trim();
+        String newPassword = current.getNewPassword().trim();
+        String confirmPassword = current.getConfirmPassword().trim();
 
         String oldError = oldPassword.isEmpty() ? "Unesite staru lozinku" : null;
         String newError = newPassword.isEmpty() ? "Unesite novu lozinku" : null;
@@ -103,15 +128,24 @@ public class ProfileViewModel extends CoreViewModel<ProfileUiState, ProfileActio
         }
 
         if (oldError != null || newError != null || confirmError != null) {
-            state.setValue(current.copy(false, current.user,
-                    current.oldPassword, current.newPassword, current.confirmPassword,
-                    oldError, newError, confirmError, current.error));
+            state.setValue(new ProfileUiState.Input(
+                    current.getUser(),
+                    current.getOldPassword(),
+                    current.getNewPassword(),
+                    current.getConfirmPassword(),
+                    oldError,
+                    newError,
+                    confirmError
+            ));
             return;
         }
 
-        state.setValue(current.copy(true, current.user,
-                current.oldPassword, current.newPassword, current.confirmPassword,
-                null, null, null, null));
+        state.setValue(new ProfileUiState.Loading(
+                current.getUser(),
+                current.getOldPassword(),
+                current.getNewPassword(),
+                current.getConfirmPassword()
+        ));
 
         changePasswordUseCase.execute(oldPassword, newPassword).thenAccept(result ->
                 new Handler(Looper.getMainLooper()).post(() -> {
@@ -119,14 +153,26 @@ public class ProfileViewModel extends CoreViewModel<ProfileUiState, ProfileActio
                     if (latest == null) return;
 
                     if (result instanceof Result.Success) {
-                        state.setValue(latest.copy(false, latest.user,
-                                "", "", "", null, null, null, null));
+                        state.setValue(new ProfileUiState.Input(
+                                latest.getUser(),
+                                "",
+                                "",
+                                "",
+                                null,
+                                null,
+                                null
+                        ));
                         sideEffect.setValue(new ProfileSideEffect.ShowToast("Lozinka uspešno promenjena."));
                     } else if (result instanceof Result.Error) {
-                        state.setValue(latest.copy(false, latest.user,
-                                latest.oldPassword, latest.newPassword, latest.confirmPassword,
-                                null, null, null, ((Result.Error<Void>) result).message));
-                        sideEffect.setValue(new ProfileSideEffect.ShowToast(((Result.Error<Void>) result).message));
+                        String message = ((Result.Error<Void>) result).message;
+                        state.setValue(new ProfileUiState.Error(
+                                latest.getUser(),
+                                latest.getOldPassword(),
+                                latest.getNewPassword(),
+                                latest.getConfirmPassword(),
+                                message
+                        ));
+                        sideEffect.setValue(new ProfileSideEffect.ShowToast(message));
                     }
                 }));
     }
