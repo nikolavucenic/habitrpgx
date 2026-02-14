@@ -15,7 +15,7 @@
 
         <action
             android:id="@+id/action_profile_to_login"
-            app:destination="@id/loginFragment"
+            app:destination="@id/auth_graph"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
     </fragment>
