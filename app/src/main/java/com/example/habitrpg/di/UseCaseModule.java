@@ -1,8 +1,10 @@
 package com.example.habitrpg.di;
 
 import com.example.domain.repository.AuthRepository;
+import com.example.domain.usecase.ChangePasswordUseCase;
 import com.example.domain.usecase.GetCurrentUserProfileUseCase;
 import com.example.domain.usecase.LoginUseCase;
+import com.example.domain.usecase.LogoutUseCase;
 import com.example.domain.usecase.RegisterUseCase;
 
 import dagger.Module;
@@ -33,5 +35,16 @@ public class UseCaseModule {
     public GetCurrentUserProfileUseCase provideGetCurrentUserProfileUseCase(AuthRepository authRepository) {
         return new GetCurrentUserProfileUseCase(authRepository);
     }
-}
 
+    @Provides
+    @Singleton
+    public ChangePasswordUseCase provideChangePasswordUseCase(AuthRepository authRepository) {
+        return new ChangePasswordUseCase(authRepository);
+    }
+
+    @Provides
+    @Singleton
+    public LogoutUseCase provideLogoutUseCase(AuthRepository authRepository) {
+        return new LogoutUseCase(authRepository);
+    }
+}

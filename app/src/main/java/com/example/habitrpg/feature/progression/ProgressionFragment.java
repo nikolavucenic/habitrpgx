@@ -31,22 +31,24 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
 
         viewModel = new ViewModelProvider(this).get(ProgressionViewModel.class);
         viewModel.getState().observe(getViewLifecycleOwner(), state -> {
-            getBinding().progressXp.setMax(Math.max(1, state.requiredXp));
-            getBinding().progressXp.setProgress(Math.min(state.currentXp, state.requiredXp));
+            ProgressionUiState.Data data = state.getData();
 
-            getBinding().ivAvatar.setImageResource(getAvatarDrawable(state.avatarId));
-            getBinding().tvHeroNameTitle.setText(getString(R.string.progression_hero_title, state.username, state.title));
-            getBinding().tvLevel.setText(getString(R.string.progression_level_value, state.level));
-            getBinding().tvPp.setText(getString(R.string.progression_pp_value, state.pp));
-            getBinding().tvXpValue.setText(getString(R.string.progression_xp_value, state.currentXp, state.requiredXp));
-            int remaining = Math.max(0, state.requiredXp - state.currentXp);
+            getBinding().progressXp.setMax(Math.max(1, data.requiredXp));
+            getBinding().progressXp.setProgress(Math.min(data.currentXp, data.requiredXp));
+
+            getBinding().ivAvatar.setImageResource(getAvatarDrawable(data.avatarId));
+            getBinding().tvHeroNameTitle.setText(getString(R.string.progression_hero_title, data.username, data.title));
+            getBinding().tvLevel.setText(getString(R.string.progression_level_value, data.level));
+            getBinding().tvPp.setText(getString(R.string.progression_pp_value, data.pp));
+            getBinding().tvXpValue.setText(getString(R.string.progression_xp_value, data.currentXp, data.requiredXp));
+            int remaining = Math.max(0, data.requiredXp - data.currentXp);
             getBinding().tvXpNeeded.setText(getString(R.string.progression_xp_needed_value, remaining));
-            getBinding().tvImportanceValues.setText(state.importancePreview);
-            getBinding().tvDifficultyValues.setText(state.difficultyPreview);
+            getBinding().tvImportanceValues.setText(data.importancePreview);
+            getBinding().tvDifficultyValues.setText(data.difficultyPreview);
 
-            if (state.error != null) {
+            if (state instanceof ProgressionUiState.Error) {
                 getBinding().tvError.setVisibility(View.VISIBLE);
-                getBinding().tvError.setText(getString(R.string.progression_error_value, state.error));
+                getBinding().tvError.setText(getString(R.string.progression_error_value, ((ProgressionUiState.Error) state).getMessage()));
             } else {
                 getBinding().tvError.setVisibility(View.GONE);
             }
