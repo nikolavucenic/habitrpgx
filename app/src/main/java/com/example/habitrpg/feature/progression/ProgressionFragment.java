@@ -1,9 +1,16 @@
 package com.example.habitrpg.feature.progression;
 
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,7 +25,7 @@ import com.example.habitrpg.databinding.FragmentProgressionBinding;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding> {
+public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding> implements SensorEventListener {
 
     private ProgressionViewModel viewModel;
     private boolean redirectedToBoss;
@@ -33,6 +40,16 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
         super.onViewCreated(view, savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(ProgressionViewModel.class);
+        sensorManager = (SensorManager) requireContext().getSystemService(Context.SENSOR_SERVICE);
+        if (sensorManager != null) {
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        }
+
+        getBinding().btnAttack.setOnClickListener(v -> viewModel.handleAction(new ProgressionAction.OnAttackClicked()));
+        getBinding().switchEquipment.setOnCheckedChangeListener((buttonView, isChecked) ->
+                viewModel.handleAction(new ProgressionAction.OnEquipmentToggle(isChecked))
+        );
+
         viewModel.getState().observe(getViewLifecycleOwner(), state -> {
             ProgressionUiState.Data data = state.getData();
 
@@ -48,6 +65,8 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
             getBinding().tvXpNeeded.setText(getString(R.string.progression_xp_needed_value, remaining));
             getBinding().tvImportanceValues.setText(data.importancePreview);
             getBinding().tvDifficultyValues.setText(data.difficultyPreview);
+
+            bindBattle(data);
 
             if (state instanceof ProgressionUiState.Error) {
                 getBinding().tvError.setVisibility(View.VISIBLE);
