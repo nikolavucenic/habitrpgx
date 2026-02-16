@@ -13,6 +13,21 @@ public interface ProgressionUiState {
         public final int requiredXp;
         public final String importancePreview;
         public final String difficultyPreview;
+        public final int bossIndex;
+        public final int bossHp;
+        public final int bossMaxHp;
+        public final int attacksLeft;
+        public final int successRate;
+        public final boolean equipmentActivated;
+        public final int effectivePp;
+        public final String equippedItem;
+        public final String battleMessage;
+        public final boolean battleFinished;
+        public final boolean bossDefeated;
+        public final int wonCoins;
+        public final String wonEquipment;
+        public final boolean chestOpened;
+        public final boolean bossAvailable;
 
         public Data(String username,
                     String title,
@@ -22,7 +37,22 @@ public interface ProgressionUiState {
                     int currentXp,
                     int requiredXp,
                     String importancePreview,
-                    String difficultyPreview) {
+                    String difficultyPreview,
+                    int bossIndex,
+                    int bossHp,
+                    int bossMaxHp,
+                    int attacksLeft,
+                    int successRate,
+                    boolean equipmentActivated,
+                    int effectivePp,
+                    String equippedItem,
+                    String battleMessage,
+                    boolean battleFinished,
+                    boolean bossDefeated,
+                    int wonCoins,
+                    String wonEquipment,
+                    boolean chestOpened,
+                    boolean bossAvailable) {
             this.username = username;
             this.title = title;
             this.level = level;
@@ -32,6 +62,38 @@ public interface ProgressionUiState {
             this.requiredXp = requiredXp;
             this.importancePreview = importancePreview;
             this.difficultyPreview = difficultyPreview;
+            this.bossIndex = bossIndex;
+            this.bossHp = bossHp;
+            this.bossMaxHp = bossMaxHp;
+            this.attacksLeft = attacksLeft;
+            this.successRate = successRate;
+            this.equipmentActivated = equipmentActivated;
+            this.effectivePp = effectivePp;
+            this.equippedItem = equippedItem;
+            this.battleMessage = battleMessage;
+            this.battleFinished = battleFinished;
+            this.bossDefeated = bossDefeated;
+            this.wonCoins = wonCoins;
+            this.wonEquipment = wonEquipment;
+            this.chestOpened = chestOpened;
+            this.bossAvailable = bossAvailable;
+        }
+
+        public Data copyWithBattle(int bossHp,
+                                   int attacksLeft,
+                                   int effectivePp,
+                                   boolean equipmentActivated,
+                                   String battleMessage,
+                                   boolean battleFinished,
+                                   boolean bossDefeated,
+                                   int wonCoins,
+                                   String wonEquipment,
+                                   boolean chestOpened,
+                                   boolean bossAvailable) {
+            return new Data(username, title, level, avatarId, pp, currentXp, requiredXp,
+                    importancePreview, difficultyPreview, bossIndex, bossHp, bossMaxHp, attacksLeft,
+                    successRate, equipmentActivated, effectivePp, equippedItem, battleMessage,
+                    battleFinished, bossDefeated, wonCoins, wonEquipment, chestOpened, bossAvailable);
         }
     }
 
@@ -81,6 +143,8 @@ public interface ProgressionUiState {
     }
 
     static Data initialData() {
-        return new Data("Heroj", "Početnik navika", 1, 1, 0, 0, 200, "", "");
+        return new Data("Heroj", "Početnik navika", 1, 1, 0, 0, 200, "", "", 1,
+                200, 200, 5, 0, false, 0, "Bez opreme",
+                "Borba počinje!", false, false, 0, null, false, true);
     }
 }
