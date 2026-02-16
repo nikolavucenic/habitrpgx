@@ -2,6 +2,7 @@ package com.example.habitrpg.feature.tasks;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -16,6 +17,10 @@ import com.example.domain.model.TaskItem;
 import com.example.habitrpg.R;
 import com.example.habitrpg.core.CoreFragment;
 import com.example.habitrpg.databinding.FragmentTasksBinding;
+import com.google.android.material.tabs.TabLayout;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -24,6 +29,7 @@ public class TasksFragment extends CoreFragment<FragmentTasksBinding> {
 
     private TasksViewModel viewModel;
     private TaskAdapter taskAdapter;
+    private List<TaskItem> allTasks = new ArrayList<>();
 
     @Override
     protected FragmentTasksBinding inflateBinding(LayoutInflater inflater, ViewGroup container) {
@@ -34,15 +40,51 @@ public class TasksFragment extends CoreFragment<FragmentTasksBinding> {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(TasksViewModel.class);
+        setupToolbar();
+        setupTabs();
         setupList();
-        setupListeners();
         setupObservers();
+        setupListeners();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         viewModel.handleAction(new TasksAction.Load());
+    }
+
+    private void setupToolbar() {
+        getBinding().toolbarTasks.setOnMenuItemClickListener(this::onToolbarMenuClick);
+    }
+
+    private boolean onToolbarMenuClick(MenuItem item) {
+        if (item.getItemId() == R.id.action_calendar) {
+            Navigation.findNavController(requireView()).navigate(R.id.action_tasks_to_calendar);
+            return true;
+        }
+        return false;
+    }
+
+    private void setupTabs() {
+        TabLayout tabs = getBinding().tabLayoutTasks;
+        tabs.removeAllTabs();
+        tabs.addTab(tabs.newTab().setText(getString(R.string.tasks_filter_all)));
+        tabs.addTab(tabs.newTab().setText(getString(R.string.tasks_filter_one_time)));
+        tabs.addTab(tabs.newTab().setText(getString(R.string.tasks_filter_repeating)));
+
+        tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                applyFilter(tab.getPosition());
+            }
+
+            @Override public void onTabUnselected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                applyFilter(tab.getPosition());
+            }
+        });
     }
 
     private void setupList() {
@@ -58,23 +100,19 @@ public class TasksFragment extends CoreFragment<FragmentTasksBinding> {
     }
 
     private void setupListeners() {
-        getBinding().fabAddTask.setOnClickListener(v ->
+        getBinding().fabCreateTask.setOnClickListener(v ->
                 Navigation.findNavController(requireView()).navigate(R.id.action_tasks_to_create_task));
-        getBinding().btnRefresh.setOnClickListener(v -> viewModel.handleAction(new TasksAction.Load()));
     }
 
     private void setupObservers() {
         viewModel.getState().observe(getViewLifecycleOwner(), state -> {
             getBinding().progressBar.setVisibility(state instanceof TasksUiState.Loading ? View.VISIBLE : View.GONE);
             if (state instanceof TasksUiState.Error) {
-                getBinding().tvError.setVisibility(View.VISIBLE);
-                getBinding().tvError.setText(((TasksUiState.Error) state).getMessage());
-            } else {
-                getBinding().tvError.setVisibility(View.GONE);
+                Toast.makeText(requireContext(), ((TasksUiState.Error) state).getMessage(), Toast.LENGTH_SHORT).show();
             }
-
-            taskAdapter.submit(state.getTasks());
-            getBinding().tvEmpty.setVisibility(state.getTasks().isEmpty() ? View.VISIBLE : View.GONE);
+            allTasks = new ArrayList<>(state.getTasks());
+            int position = getBinding().tabLayoutTasks.getSelectedTabPosition();
+            applyFilter(position < 0 ? 0 : position);
         });
 
         viewModel.getEffect().observe(getViewLifecycleOwner(), effect -> {
@@ -82,5 +120,20 @@ public class TasksFragment extends CoreFragment<FragmentTasksBinding> {
                 Toast.makeText(requireContext(), ((TasksSideEffect.ShowToast) effect).message, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void applyFilter(int tabPosition) {
+        List<TaskItem> filtered = new ArrayList<>();
+        for (TaskItem task : allTasks) {
+            if (tabPosition == 0) {
+                filtered.add(task);
+            } else if (tabPosition == 1 && TaskItem.TYPE_ONE_TIME.equals(task.getType())) {
+                filtered.add(task);
+            } else if (tabPosition == 2 && TaskItem.TYPE_REPEATING.equals(task.getType())) {
+                filtered.add(task);
+            }
+        }
+        taskAdapter.submit(filtered);
+        getBinding().tvEmptyTasks.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
     }
 }

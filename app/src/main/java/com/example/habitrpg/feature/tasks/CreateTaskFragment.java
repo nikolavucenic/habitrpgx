@@ -1,6 +1,8 @@
 package com.example.habitrpg.feature.tasks;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +21,12 @@ import com.example.domain.model.TaskItem;
 import com.example.habitrpg.core.CoreFragment;
 import com.example.habitrpg.databinding.FragmentCreateTaskBinding;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -29,9 +35,16 @@ public class CreateTaskFragment extends CoreFragment<FragmentCreateTaskBinding> 
 
     private TasksViewModel viewModel;
     private List<TaskCategory> categories = new ArrayList<>();
-    private final String[] difficulties = {"VEOMA_LAK", "LAK", "TEZAK", "EKSTREMNO_TEZAK"};
-    private final String[] importances = {"NORMALAN", "VAZAN", "EKSTREMNO_VAZAN", "SPECIJALAN"};
-    private final String[] types = {TaskItem.TYPE_ONE_TIME, TaskItem.TYPE_REPEATING};
+
+    private final String[] frequencyOptions = {"ONE_TIME", "REPEATING"};
+    private final String[] importanceOptions = {"NORMALAN", "VAZAN", "EKSTREMNO_VAZAN", "SPECIJALAN"};
+    private final String[] difficultyOptions = {"VEOMA_LAK", "LAK", "TEZAK", "EKSTREMNO_TEZAK"};
+    private final String[] repeatUnits = {"DAY", "WEEK"};
+
+    private long selectedExecuteAt = System.currentTimeMillis();
+    private long selectedEndTimeAt = System.currentTimeMillis();
+    private long selectedRepeatStartDate = System.currentTimeMillis();
+    private long selectedRepeatEndDate = 0L;
 
     @Override
     protected FragmentCreateTaskBinding inflateBinding(LayoutInflater inflater, ViewGroup container) {
@@ -42,30 +55,57 @@ public class CreateTaskFragment extends CoreFragment<FragmentCreateTaskBinding> 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(TasksViewModel.class);
-
-        getBinding().spinnerDifficulty.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, difficulties));
-        getBinding().spinnerImportance.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, importances));
-        getBinding().spinnerType.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, types));
-
+        setupDropdowns();
         setupListeners();
         setupObservers();
+        syncDateTimeFields();
         viewModel.handleAction(new TasksAction.Load());
     }
 
+    private void setupDropdowns() {
+        getBinding().actFrequency.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, frequencyOptions));
+        getBinding().actImportance.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, importanceOptions));
+        getBinding().actDifficulty.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, difficultyOptions));
+        getBinding().actUnit.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, repeatUnits));
+
+        getBinding().actFrequency.setText(frequencyOptions[0], false);
+        getBinding().actImportance.setText(importanceOptions[0], false);
+        getBinding().actDifficulty.setText(difficultyOptions[1], false);
+        getBinding().actUnit.setText(repeatUnits[0], false);
+        getBinding().etInterval.setText("1");
+    }
+
     private void setupListeners() {
-        getBinding().btnSaveTask.setOnClickListener(v -> submitTask());
         getBinding().btnAddCategory.setOnClickListener(v -> showCreateCategoryDialog());
-        getBinding().toolbar.setNavigationOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
+        getBinding().btnCancel.setOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
+        getBinding().btnSave.setOnClickListener(v -> submitTask());
+
+        getBinding().actFrequency.setOnItemClickListener((parent, view, position, id) -> {
+            boolean repeating = "REPEATING".equals(frequencyOptions[position]);
+            getBinding().cardRepeat.setVisibility(repeating ? View.VISIBLE : View.GONE);
+        });
+
+        getBinding().etTime.setOnClickListener(v -> showDateTimePicker(true));
+        getBinding().etEndTime.setOnClickListener(v -> showDateTimePicker(false));
+        getBinding().etStartDate.setOnClickListener(v -> showDatePicker(true));
+        getBinding().etEndDate.setOnClickListener(v -> showDatePicker(false));
     }
 
     private void setupObservers() {
         viewModel.getState().observe(getViewLifecycleOwner(), state -> {
             categories = state.getCategories();
-            List<String> names = new ArrayList<>();
-            for (TaskCategory category : categories) names.add(category.getName());
-            getBinding().spinnerCategory.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, names));
-            getBinding().btnSaveTask.setEnabled(!categories.isEmpty());
-            getBinding().tvCategoryHint.setVisibility(categories.isEmpty() ? View.VISIBLE : View.GONE);
+            List<String> categoryNames = new ArrayList<>();
+            for (TaskCategory category : categories) {
+                categoryNames.add(category.getName());
+            }
+            getBinding().actCategory.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, categoryNames));
+            if (!categoryNames.isEmpty() && (getBinding().actCategory.getText() == null || getBinding().actCategory.getText().toString().isEmpty())) {
+                getBinding().actCategory.setText(categoryNames.get(0), false);
+            }
+
+            boolean hasCategories = !categories.isEmpty();
+            getBinding().btnSave.setEnabled(hasCategories);
+            getBinding().tilCategory.setError(hasCategories ? null : "Dodaj kategoriju");
         });
 
         viewModel.getEffect().observe(getViewLifecycleOwner(), effect -> {
@@ -80,35 +120,44 @@ public class CreateTaskFragment extends CoreFragment<FragmentCreateTaskBinding> 
     }
 
     private void submitTask() {
-        String title = getBinding().etTitle.getText().toString().trim();
-        if (title.isEmpty()) {
-            getBinding().tilTitle.setError("Naziv zadatka je obavezan.");
+        String name = safeText(getBinding().etName.getText());
+        if (name.isEmpty()) {
+            getBinding().tilName.setError("Naziv zadatka je obavezan");
             return;
         }
-        getBinding().tilTitle.setError(null);
+        getBinding().tilName.setError(null);
 
         if (categories.isEmpty()) {
-            Toast.makeText(requireContext(), "Prvo kreirajte kategoriju.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Prvo dodaj kategoriju", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        TaskCategory category = categories.get(getBinding().spinnerCategory.getSelectedItemPosition());
-        String difficulty = difficulties[getBinding().spinnerDifficulty.getSelectedItemPosition()];
-        String importance = importances[getBinding().spinnerImportance.getSelectedItemPosition()];
+        TaskCategory selectedCategory = findSelectedCategory(getBinding().actCategory.getText() == null ? "" : getBinding().actCategory.getText().toString());
+        if (selectedCategory == null) {
+            Toast.makeText(requireContext(), "Izaberi kategoriju", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String frequency = getBinding().actFrequency.getText() == null ? "ONE_TIME" : getBinding().actFrequency.getText().toString();
+        String difficulty = getBinding().actDifficulty.getText() == null ? difficultyOptions[1] : getBinding().actDifficulty.getText().toString();
+        String importance = getBinding().actImportance.getText() == null ? importanceOptions[0] : getBinding().actImportance.getText().toString();
+
+        int repeatInterval = parseIntOrDefault(safeText(getBinding().etInterval.getText()), 1);
+        String repeatUnit = getBinding().actUnit.getText() == null ? "DAY" : getBinding().actUnit.getText().toString();
 
         TaskItem task = new TaskItem(
                 "",
-                title,
-                getBinding().etDescription.getText().toString().trim(),
-                category.getId(),
-                category.getName(),
-                category.getColorHex(),
-                types[getBinding().spinnerType.getSelectedItemPosition()],
-                parseIntOrDefault(getBinding().etRepeatInterval.getText().toString().trim(), 1),
-                "DAY",
-                System.currentTimeMillis(),
-                0,
-                System.currentTimeMillis(),
+                name,
+                safeText(getBinding().etDescription.getText()),
+                selectedCategory.getId(),
+                selectedCategory.getName(),
+                selectedCategory.getColorHex(),
+                "REPEATING".equals(frequency) ? TaskItem.TYPE_REPEATING : TaskItem.TYPE_ONE_TIME,
+                repeatInterval,
+                repeatUnit,
+                selectedRepeatStartDate,
+                selectedRepeatEndDate,
+                selectedExecuteAt,
                 difficulty,
                 importance,
                 difficultyXp(difficulty) + importanceXp(importance),
@@ -117,6 +166,13 @@ public class CreateTaskFragment extends CoreFragment<FragmentCreateTaskBinding> 
         );
 
         viewModel.handleAction(new TasksAction.CreateTask(task));
+    }
+
+    private TaskCategory findSelectedCategory(String categoryName) {
+        for (TaskCategory category : categories) {
+            if (category.getName().equals(categoryName)) return category;
+        }
+        return categories.isEmpty() ? null : categories.get(0);
     }
 
     private void showCreateCategoryDialog() {
@@ -139,6 +195,62 @@ public class CreateTaskFragment extends CoreFragment<FragmentCreateTaskBinding> 
                         viewModel.handleAction(new TasksAction.CreateCategory(etName.getText().toString(), etColor.getText().toString())))
                 .setNegativeButton("Otkaži", null)
                 .show();
+    }
+
+    private void showDateTimePicker(boolean start) {
+        final Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(start ? selectedExecuteAt : selectedEndTimeAt);
+
+        DatePickerDialog dateDialog = new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
+            Calendar picked = Calendar.getInstance();
+            picked.set(year, month, dayOfMonth, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+
+            TimePickerDialog timeDialog = new TimePickerDialog(requireContext(), (timePicker, hourOfDay, minute) -> {
+                picked.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                picked.set(Calendar.MINUTE, minute);
+                if (start) {
+                    selectedExecuteAt = picked.getTimeInMillis();
+                } else {
+                    selectedEndTimeAt = picked.getTimeInMillis();
+                }
+                syncDateTimeFields();
+            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+            timeDialog.show();
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        dateDialog.show();
+    }
+
+    private void showDatePicker(boolean startDate) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(startDate ? selectedRepeatStartDate : (selectedRepeatEndDate == 0L ? System.currentTimeMillis() : selectedRepeatEndDate));
+
+        DatePickerDialog dateDialog = new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
+            Calendar picked = Calendar.getInstance();
+            picked.set(year, month, dayOfMonth, 0, 0, 0);
+            picked.set(Calendar.MILLISECOND, 0);
+            if (startDate) {
+                selectedRepeatStartDate = picked.getTimeInMillis();
+            } else {
+                selectedRepeatEndDate = picked.getTimeInMillis();
+            }
+            syncDateTimeFields();
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
+        dateDialog.show();
+    }
+
+    private void syncDateTimeFields() {
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+
+        getBinding().etTime.setText(dateTimeFormat.format(new Date(selectedExecuteAt)));
+        getBinding().etEndTime.setText(dateTimeFormat.format(new Date(selectedEndTimeAt)));
+        getBinding().etStartDate.setText(dateFormat.format(new Date(selectedRepeatStartDate)));
+        getBinding().etEndDate.setText(selectedRepeatEndDate == 0L ? "" : dateFormat.format(new Date(selectedRepeatEndDate)));
+    }
+
+    private String safeText(android.text.Editable text) {
+        return text == null ? "" : text.toString().trim();
     }
 
     private int difficultyXp(String value) {

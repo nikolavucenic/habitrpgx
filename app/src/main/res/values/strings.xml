@@ -55,4 +55,32 @@
     <string name="progression_importance_title">XP po bitnosti zadatka</string>
     <string name="progression_difficulty_title">XP po težini zadatka</string>
     <string name="progression_error_value">Napomena: %1$s</string>
+
+    <string name="tasks_title">Zadaci</string>
+    <string name="no_tasks_yet">Još uvek nema zadataka.</string>
+    <string name="create_task">Kreiraj zadatak</string>
+    <string name="task_calendar">Kalendar zadataka</string>
+    <string name="selected_day">Odabrani dan</string>
+    <string name="no_tasks_for_day">Nema zadataka za odabrani dan.</string>
+
+    <string name="tasks_filter_all">Svi</string>
+    <string name="tasks_filter_one_time">Jednokratni</string>
+    <string name="tasks_filter_repeating">Ponavljajući</string>
+
+    <string name="category">Kategorija</string>
+    <string name="frequency">Učestalost</string>
+    <string name="importance">Bitnost</string>
+    <string name="difficulty">Težina</string>
+    <string name="task_name">Naziv zadatka</string>
+    <string name="description_optional">Opis (opciono)</string>
+    <string name="start_time">Vreme početka</string>
+    <string name="end_time">Vreme završetka</string>
+    <string name="repeat_settings">Podešavanja ponavljanja</string>
+    <string name="interval">Interval</string>
+    <string name="unit">Jedinica</string>
+    <string name="start_date">Datum početka</string>
+    <string name="end_date">Datum završetka</string>
+    <string name="cancel">Otkaži</string>
+    <string name="save">Sačuvaj</string>
+
 </resources>
