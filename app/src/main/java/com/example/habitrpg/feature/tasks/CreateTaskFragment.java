@@ -178,6 +178,16 @@ public class CreateTaskFragment extends CoreFragment<FragmentCreateTaskBinding> 
         String repeatUnit = getMappedOrDefault(repeatUnitMap, unitLabel, "DAY");
 
         int repeatInterval = parseIntOrDefault(textValue(getBinding().etInterval.getText()), 1);
+        if (TaskItem.TYPE_REPEATING.equals(frequency)) {
+            if (repeatInterval <= 0) {
+                Toast.makeText(requireContext(), "Interval mora biti veći od 0", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (selectedRepeatEndDate == 0L || selectedRepeatEndDate < selectedRepeatStartDate) {
+                Toast.makeText(requireContext(), "Odaberi validan datum završetka ponavljanja", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
 
         TaskItem task = new TaskItem(
                 "",
@@ -194,7 +204,7 @@ public class CreateTaskFragment extends CoreFragment<FragmentCreateTaskBinding> 
                 selectedExecuteAt,
                 difficulty,
                 importance,
-                difficultyXp(difficulty) + importanceXp(importance),
+                0,
                 TaskItem.STATUS_ACTIVE,
                 System.currentTimeMillis()
         );

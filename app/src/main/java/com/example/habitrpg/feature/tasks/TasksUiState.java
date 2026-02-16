@@ -15,31 +15,35 @@ public abstract class TasksUiState {
     private final List<TaskItem> tasks;
     private final List<TaskItem> filteredTasks;
     private final int selectedFilter;
+    private final TaskItem selectedTask;
 
     protected TasksUiState(List<TaskCategory> categories,
                            List<TaskItem> tasks,
                            List<TaskItem> filteredTasks,
-                           int selectedFilter) {
+                           int selectedFilter,
+                           TaskItem selectedTask) {
         this.categories = categories;
         this.tasks = tasks;
         this.filteredTasks = filteredTasks;
         this.selectedFilter = selectedFilter;
+        this.selectedTask = selectedTask;
     }
 
     public List<TaskCategory> getCategories() { return categories; }
     public List<TaskItem> getTasks() { return tasks; }
     public List<TaskItem> getFilteredTasks() { return filteredTasks; }
     public int getSelectedFilter() { return selectedFilter; }
+    public TaskItem getSelectedTask() { return selectedTask; }
 
     public static class Loading extends TasksUiState {
-        public Loading(List<TaskCategory> categories, List<TaskItem> tasks, List<TaskItem> filteredTasks, int selectedFilter) {
-            super(categories, tasks, filteredTasks, selectedFilter);
+        public Loading(List<TaskCategory> categories, List<TaskItem> tasks, List<TaskItem> filteredTasks, int selectedFilter, TaskItem selectedTask) {
+            super(categories, tasks, filteredTasks, selectedFilter, selectedTask);
         }
     }
 
     public static class Data extends TasksUiState {
-        public Data(List<TaskCategory> categories, List<TaskItem> tasks, List<TaskItem> filteredTasks, int selectedFilter) {
-            super(categories, tasks, filteredTasks, selectedFilter);
+        public Data(List<TaskCategory> categories, List<TaskItem> tasks, List<TaskItem> filteredTasks, int selectedFilter, TaskItem selectedTask) {
+            super(categories, tasks, filteredTasks, selectedFilter, selectedTask);
         }
     }
 
@@ -50,8 +54,9 @@ public abstract class TasksUiState {
                      List<TaskItem> tasks,
                      List<TaskItem> filteredTasks,
                      int selectedFilter,
+                     TaskItem selectedTask,
                      String message) {
-            super(categories, tasks, filteredTasks, selectedFilter);
+            super(categories, tasks, filteredTasks, selectedFilter, selectedTask);
             this.message = message;
         }
 
@@ -59,6 +64,6 @@ public abstract class TasksUiState {
     }
 
     public static TasksUiState initial() {
-        return new Loading(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), FILTER_ALL);
+        return new Loading(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), FILTER_ALL, null);
     }
 }
