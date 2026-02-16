@@ -7,12 +7,17 @@ import android.os.Looper;
 import androidx.lifecycle.SavedStateHandle;
 
 import com.example.domain.core.Result;
+import com.example.domain.model.TaskItem;
 import com.example.domain.model.User;
+import com.example.domain.progression.BossBattleCalculator;
 import com.example.domain.progression.ProgressionCalculator;
 import com.example.domain.usecase.GetCurrentUserProfileUseCase;
 import com.example.habitrpg.core.CoreViewModel;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -47,18 +52,30 @@ public class ProgressionViewModel extends CoreViewModel<ProgressionUiState, Prog
         ProgressionUiState.Data currentData = current != null ? current.getData() : ProgressionUiState.initialData();
         state.setValue(new ProgressionUiState.Loading(currentData));
 
-        getCurrentUserProfileUseCase.execute().thenAccept(result ->
+        getCurrentUserProfileUseCase.execute().thenAccept(profileResult ->
                 new Handler(Looper.getMainLooper()).post(() -> {
                     if (result instanceof Result.Success) {
                         state.setValue(new ProgressionUiState.Success(toData(((Result.Success<User>) result).data)));
                     } else if (result instanceof Result.Error) {
                         state.setValue(new ProgressionUiState.Error(currentData, ((Result.Error<User>) result).message));
                     }
+
+                    User user = ((Result.Success<User>) profileResult).data;
+                    uid = user.uid;
+                    getTasksUseCase.execute().thenAccept(tasksResult ->
+                            new Handler(Looper.getMainLooper()).post(() -> {
+                                List<TaskItem> tasks = new ArrayList<>();
+                                if (tasksResult instanceof Result.Success) {
+                                    tasks = ((Result.Success<List<TaskItem>>) tasksResult).data;
+                                }
+                                state.setValue(new ProgressionUiState.Success(toData(user, tasks)));
+                            })
+                    );
                 })
         );
     }
 
-    private ProgressionUiState.Data toData(User user) {
+    private ProgressionUiState.Data toData(User user, List<TaskItem> tasks) {
         int passedLevels = Math.max(0, user.level - 1);
         int requiredXp = ProgressionCalculator.requiredXpForLevel(user.level);
         int defeatedBossCount = sharedPreferences.getInt(KEY_DEFEATED_BOSS_PREFIX + user.uid, 0);
@@ -78,6 +95,43 @@ public class ProgressionViewModel extends CoreViewModel<ProgressionUiState, Prog
                 formatPreview(ProgressionCalculator.difficultyXpByPassedLevel(passedLevels)),
                 hasBossEncounter
         );
+        state.setValue(new ProgressionUiState.Success(updated));
+    }
+
+    private int readDefeatedBossCount() {
+        if (uid == null || uid.isEmpty()) return 0;
+        return Math.max(0, sharedPreferences.getInt(KEY_DEFEATED_BOSS_PREFIX + uid, 0));
+    }
+
+    private void saveDefeatedBossCount(int value) {
+        if (uid == null || uid.isEmpty()) return;
+        sharedPreferences.edit().putInt(KEY_DEFEATED_BOSS_PREFIX + uid, Math.max(0, value)).apply();
+    }
+
+    private int readActiveBossIndex(int fallback) {
+        if (uid == null || uid.isEmpty()) return fallback;
+        return Math.max(1, sharedPreferences.getInt(KEY_ACTIVE_BOSS_INDEX_PREFIX + uid, fallback));
+    }
+
+    private int readActiveBossHp(int fallback) {
+        if (uid == null || uid.isEmpty()) return fallback;
+        return Math.max(0, sharedPreferences.getInt(KEY_ACTIVE_BOSS_HP_PREFIX + uid, fallback));
+    }
+
+    private void saveActiveBoss(int bossIndex, int bossHp) {
+        if (uid == null || uid.isEmpty()) return;
+        sharedPreferences.edit()
+                .putInt(KEY_ACTIVE_BOSS_INDEX_PREFIX + uid, Math.max(1, bossIndex))
+                .putInt(KEY_ACTIVE_BOSS_HP_PREFIX + uid, Math.max(0, bossHp))
+                .apply();
+    }
+
+    private void clearActiveBoss() {
+        if (uid == null || uid.isEmpty()) return;
+        sharedPreferences.edit()
+                .remove(KEY_ACTIVE_BOSS_INDEX_PREFIX + uid)
+                .remove(KEY_ACTIVE_BOSS_HP_PREFIX + uid)
+                .apply();
     }
 
     private String formatPreview(Map<String, Integer> values) {
