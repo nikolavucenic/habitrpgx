@@ -80,7 +80,8 @@ public class ProgressionViewModel extends CoreViewModel<ProgressionUiState, Prog
         int requiredXp = ProgressionCalculator.requiredXpForLevel(user.level);
         int defeatedBossCount = sharedPreferences.getInt(KEY_DEFEATED_BOSS_PREFIX + user.uid, 0);
         int pendingBossIndex = defeatedBossCount + 1;
-        boolean hasBossEncounter = pendingBossIndex <= Math.max(1, user.level);
+        int unlockedBossCount = Math.max(0, user.level - 1);
+        boolean hasBossEncounter = pendingBossIndex <= unlockedBossCount;
 
         return new ProgressionUiState.Data(
                 user.username,
@@ -93,27 +94,6 @@ public class ProgressionViewModel extends CoreViewModel<ProgressionUiState, Prog
                 formatPreview(ProgressionCalculator.importanceXpByPassedLevel(passedLevels)),
                 formatPreview(ProgressionCalculator.difficultyXpByPassedLevel(passedLevels)),
                 hasBossEncounter
-        );
-    }
-
-    private void openChest() {
-        ProgressionUiState current = state.getValue();
-        if (current == null) return;
-        ProgressionUiState.Data data = current.getData();
-        if (!data.battleFinished || !data.bossAvailable) return;
-
-        ProgressionUiState.Data updated = data.copyWithBattle(
-                data.bossHp,
-                data.attacksLeft,
-                data.effectivePp,
-                data.equipmentActivated,
-                "Kovčeg je otvoren!",
-                true,
-                data.bossDefeated,
-                data.wonCoins,
-                data.wonEquipment,
-                true,
-                true
         );
         state.setValue(new ProgressionUiState.Success(updated));
     }

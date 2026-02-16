@@ -77,7 +77,8 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
 
                     int defeatedBosses = readDefeatedBossCount();
                     int pendingBossIndex = defeatedBosses + 1;
-                    boolean available = pendingBossIndex <= Math.max(1, user.level);
+                    int unlockedBossCount = Math.max(0, user.level - 1);
+                    boolean available = pendingBossIndex <= unlockedBossCount;
                     if (!available) {
                         BossBattleUiState.Data data = new BossBattleUiState.Data(
                                 pendingBossIndex,
