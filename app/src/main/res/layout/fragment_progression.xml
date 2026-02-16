@@ -21,6 +21,25 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/tv_encounter_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#1A1B2F"
+            android:padding="10dp"
+            android:text="@string/progression_encounter_hint"
+            android:textColor="#FFD54F"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btn_open_encounter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/progression_open_encounter"
+            android:visibility="gone" />
+
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -155,7 +174,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    tools:text="• Normalan: 1 XP\n• Važan: 3 XP\n• Ekstremno važan: 10 XP\n• Specijalan: 100 XP" />
+                    tools:text="• Normalan: 1 XP" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -186,7 +205,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    tools:text="• Lako: 2 XP\n• Srednje: 5 XP\n• Teško: 9 XP" />
+                    tools:text="• Lako: 2 XP" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
