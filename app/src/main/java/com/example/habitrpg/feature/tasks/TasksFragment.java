@@ -1,5 +1,6 @@
 package com.example.habitrpg.feature.tasks;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -93,6 +94,7 @@ public class TasksFragment extends CoreFragment<FragmentTasksBinding> {
                 viewModel.handleAction(new TasksAction.SelectTask(taskId));
                 Navigation.findNavController(requireView()).navigate(R.id.action_tasks_to_detail);
             }
+            @Override public void onRequestDelete(String taskId) { confirmDelete(taskId); }
             @Override public void onSetDone(String taskId) { viewModel.handleAction(new TasksAction.ChangeStatus(taskId, TaskItem.STATUS_DONE)); }
             @Override public void onSetCanceled(String taskId) { viewModel.handleAction(new TasksAction.ChangeStatus(taskId, TaskItem.STATUS_CANCELED)); }
             @Override public void onSetPaused(String taskId) { viewModel.handleAction(new TasksAction.ChangeStatus(taskId, TaskItem.STATUS_PAUSED)); }
@@ -106,6 +108,15 @@ public class TasksFragment extends CoreFragment<FragmentTasksBinding> {
     private void setupListeners() {
         getBinding().fabCreateTask.setOnClickListener(v ->
                 Navigation.findNavController(requireView()).navigate(R.id.action_tasks_to_create_task));
+    }
+
+    private void confirmDelete(String taskId) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Brisanje zadatka")
+                .setMessage("Da li želiš da obrišeš ovaj zadatak?")
+                .setPositiveButton("Obriši", (d, w) -> viewModel.handleAction(new TasksAction.DeleteTask(taskId)))
+                .setNegativeButton("Otkaži", null)
+                .show();
     }
 
     private void setupObservers() {
