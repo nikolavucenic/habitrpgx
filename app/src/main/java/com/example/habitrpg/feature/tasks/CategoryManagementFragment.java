@@ -49,7 +49,6 @@ public class CategoryManagementFragment extends CoreFragment<FragmentCategoryMan
 
         getBinding().toolbarCategories.setNavigationOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
         setupList();
-        setupFabInsets();
         getBinding().fabAddCategory.setOnClickListener(v -> showCreateDialog());
 
         viewModel.getState().observe(getViewLifecycleOwner(), state -> {
@@ -95,18 +94,6 @@ public class CategoryManagementFragment extends CoreFragment<FragmentCategoryMan
         categoryColorMap.put("Tirkizna", "#0D9488");
         categoryColorMap.put("Ružičasta", "#DB2777");
         categoryColorMap.put("Siva", "#4B5563");
-    }
-
-    private void setupFabInsets() {
-        final int defaultFabMargin = 16;
-        ViewCompat.setOnApplyWindowInsetsListener(getBinding().fabAddCategory, (view, windowInsets) -> {
-            WindowInsetsCompat.Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-            ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
-            int bottomMarginPx = Math.round(defaultFabMargin * view.getResources().getDisplayMetrics().density);
-            layoutParams.bottomMargin = bottomMarginPx + systemBars.bottom;
-            view.setLayoutParams(layoutParams);
-            return windowInsets;
-        });
     }
 
     private void showCreateDialog() {
