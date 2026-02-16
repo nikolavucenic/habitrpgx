@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.habitrpg.R;
 import com.example.habitrpg.core.CoreFragment;
@@ -52,9 +54,32 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
             } else {
                 getBinding().tvError.setVisibility(View.GONE);
             }
+
+            if (data.hasBossEncounter) {
+                getBinding().tvEncounterHint.setVisibility(View.VISIBLE);
+                getBinding().btnOpenEncounter.setVisibility(View.VISIBLE);
+            } else {
+                getBinding().tvEncounterHint.setVisibility(View.GONE);
+                getBinding().btnOpenEncounter.setVisibility(View.GONE);
+            }
         });
 
-        viewModel.load();
+        viewModel.getEffect().observe(getViewLifecycleOwner(), effect -> {
+            if (effect instanceof ProgressionSideEffect.NavigateToBossBattle) {
+                navigateToBossBattle();
+            }
+        });
+
+        getBinding().btnOpenEncounter.setOnClickListener(v -> navigateToBossBattle());
+        viewModel.handleAction(new ProgressionAction.Load());
+    }
+
+    private void navigateToBossBattle() {
+        NavController navController = NavHostFragment.findNavController(this);
+        if (navController.getCurrentDestination() != null
+                && navController.getCurrentDestination().getId() == R.id.nav_progression) {
+            navController.navigate(R.id.action_progression_to_boss_battle);
+        }
     }
 
     private int getAvatarDrawable(int avatarId) {
