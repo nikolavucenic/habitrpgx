@@ -66,6 +66,10 @@
     <string name="progression_success_rate">Šansa za pogodak: %1$d%%</string>
     <string name="progression_attacks_left">Preostali napadi: %1$d/5</string>
     <string name="progression_rewards">Nagrade: %1$d novčića%2$s</string>
+    <string name="progression_encounter_hint">Boss encounter je aktivan! Automatski ulaziš u borbu.</string>
+    <string name="progression_open_encounter">Uđi u boss battle</string>
+    <string name="boss_battle_screen_title">Boss Encounter</string>
+    <string name="boss_battle_title_value">Drevni Bos #%1$d</string>
 
     <string name="tasks_title">Zadaci</string>
     <string name="no_tasks_yet">Još uvek nema zadataka.</string>
