@@ -20,6 +20,8 @@ import java.util.Locale;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
 
     public interface TaskStatusListener {
+        void onOpenDetails(String taskId);
+        void onRequestDelete(String taskId);
         void onSetDone(String taskId);
         void onSetCanceled(String taskId);
         void onSetPaused(String taskId);
@@ -93,6 +95,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             binding.btnPause.setVisibility(active && TaskItem.TYPE_REPEATING.equals(task.getType()) ? View.VISIBLE : View.GONE);
             binding.btnActivate.setVisibility(paused ? View.VISIBLE : View.GONE);
 
+            binding.getRoot().setOnClickListener(v -> listener.onOpenDetails(task.getId()));
+            binding.getRoot().setOnLongClickListener(v -> {
+                listener.onRequestDelete(task.getId());
+                return true;
+            });
             binding.btnDone.setOnClickListener(v -> listener.onSetDone(task.getId()));
             binding.btnCancel.setOnClickListener(v -> listener.onSetCanceled(task.getId()));
             binding.btnPause.setOnClickListener(v -> listener.onSetPaused(task.getId()));

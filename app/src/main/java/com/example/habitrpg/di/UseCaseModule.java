@@ -6,12 +6,16 @@ import com.example.domain.usecase.ChangeTaskStatusUseCase;
 import com.example.domain.usecase.ChangePasswordUseCase;
 import com.example.domain.usecase.CreateCategoryUseCase;
 import com.example.domain.usecase.CreateTaskUseCase;
+import com.example.domain.usecase.DeleteCategoryUseCase;
+import com.example.domain.usecase.DeleteTaskUseCase;
 import com.example.domain.usecase.GetCategoriesUseCase;
 import com.example.domain.usecase.GetCurrentUserProfileUseCase;
 import com.example.domain.usecase.GetTasksUseCase;
 import com.example.domain.usecase.LoginUseCase;
 import com.example.domain.usecase.LogoutUseCase;
 import com.example.domain.usecase.RegisterUseCase;
+import com.example.domain.usecase.UpdateCategoryUseCase;
+import com.example.domain.usecase.UpdateTaskUseCase;
 
 import dagger.Module;
 import dagger.Provides;
@@ -74,8 +78,32 @@ public class UseCaseModule {
 
     @Provides
     @Singleton
+    public UpdateTaskUseCase provideUpdateTaskUseCase(TaskRepository taskRepository) {
+        return new UpdateTaskUseCase(taskRepository);
+    }
+
+    @Provides
+    @Singleton
+    public DeleteTaskUseCase provideDeleteTaskUseCase(TaskRepository taskRepository) {
+        return new DeleteTaskUseCase(taskRepository);
+    }
+
+    @Provides
+    @Singleton
     public CreateCategoryUseCase provideCreateCategoryUseCase(TaskRepository taskRepository) {
         return new CreateCategoryUseCase(taskRepository);
+    }
+
+    @Provides
+    @Singleton
+    public UpdateCategoryUseCase provideUpdateCategoryUseCase(TaskRepository taskRepository) {
+        return new UpdateCategoryUseCase(taskRepository);
+    }
+
+    @Provides
+    @Singleton
+    public DeleteCategoryUseCase provideDeleteCategoryUseCase(TaskRepository taskRepository) {
+        return new DeleteCategoryUseCase(taskRepository);
     }
 
     @Provides

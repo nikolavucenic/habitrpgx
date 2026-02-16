@@ -60,6 +60,7 @@
     <string name="no_tasks_yet">Još uvek nema zadataka.</string>
     <string name="create_task">Kreiraj zadatak</string>
     <string name="task_calendar">Kalendar zadataka</string>
+    <string name="categories_title">Kategorije</string>
     <string name="selected_day">Odabrani dan</string>
     <string name="no_tasks_for_day">Nema zadataka za odabrani dan.</string>
 

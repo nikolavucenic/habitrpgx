@@ -14,8 +14,10 @@ public interface TaskRepository {
     CompletableFuture<Result<Void>> deleteCategory(String categoryId);
 
     CompletableFuture<Result<List<TaskItem>>> getTasks();
+    CompletableFuture<Result<TaskItem>> getTaskById(String taskId);
     CompletableFuture<Result<Void>> createTask(TaskItem taskItem);
     CompletableFuture<Result<Void>> updateTask(TaskItem taskItem);
     CompletableFuture<Result<Void>> deleteTask(String taskId);
     CompletableFuture<Result<Void>> changeTaskStatus(String taskId, String newStatus);
+    CompletableFuture<Result<Void>> incrementCurrentUserXp(int xp);
 }

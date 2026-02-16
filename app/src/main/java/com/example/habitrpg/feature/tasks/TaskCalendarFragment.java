@@ -1,5 +1,6 @@
 package com.example.habitrpg.feature.tasks;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.domain.model.TaskItem;
@@ -60,6 +62,11 @@ public class TaskCalendarFragment extends CoreFragment<FragmentTaskCalendarBindi
 
     private void setupList() {
         taskAdapter = new TaskAdapter(new TaskAdapter.TaskStatusListener() {
+            @Override public void onOpenDetails(String taskId) {
+                viewModel.handleAction(new TasksAction.SelectTask(taskId));
+                Navigation.findNavController(requireView()).navigate(com.example.habitrpg.R.id.nav_task_detail);
+            }
+            @Override public void onRequestDelete(String taskId) { confirmDelete(taskId); }
             @Override public void onSetDone(String taskId) { viewModel.handleAction(new TasksAction.ChangeStatus(taskId, TaskItem.STATUS_DONE)); }
             @Override public void onSetCanceled(String taskId) { viewModel.handleAction(new TasksAction.ChangeStatus(taskId, TaskItem.STATUS_CANCELED)); }
             @Override public void onSetPaused(String taskId) { viewModel.handleAction(new TasksAction.ChangeStatus(taskId, TaskItem.STATUS_PAUSED)); }
@@ -79,6 +86,15 @@ public class TaskCalendarFragment extends CoreFragment<FragmentTaskCalendarBindi
             filterTasksForSelectedDay();
         });
         renderSelectedDay();
+    }
+
+    private void confirmDelete(String taskId) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Brisanje zadatka")
+                .setMessage("Da li želiš da obrišeš ovaj zadatak?")
+                .setPositiveButton("Obriši", (d, w) -> viewModel.handleAction(new TasksAction.DeleteTask(taskId)))
+                .setNegativeButton("Otkaži", null)
+                .show();
     }
 
     private void setupObservers() {

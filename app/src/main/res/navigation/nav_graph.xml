@@ -33,6 +33,14 @@
         <action
             android:id="@+id/action_tasks_to_calendar"
             app:destination="@id/nav_task_calendar" />
+
+        <action
+            android:id="@+id/action_tasks_to_detail"
+            app:destination="@id/nav_task_detail" />
+
+        <action
+            android:id="@+id/action_tasks_to_categories"
+            app:destination="@id/nav_categories" />
     </fragment>
 
     <fragment
@@ -47,6 +55,18 @@
         android:name="com.example.habitrpg.feature.tasks.TaskCalendarFragment"
         android:label="fragment_task_calendar"
         tools:layout="@layout/fragment_task_calendar" />
+
+    <fragment
+        android:id="@+id/nav_task_detail"
+        android:name="com.example.habitrpg.feature.tasks.TaskDetailFragment"
+        android:label="fragment_task_detail"
+        tools:layout="@layout/fragment_task_detail" />
+
+    <fragment
+        android:id="@+id/nav_categories"
+        android:name="com.example.habitrpg.feature.tasks.CategoryManagementFragment"
+        android:label="fragment_category_management"
+        tools:layout="@layout/fragment_category_management" />
 
     <fragment
         android:id="@+id/nav_shop"
