@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.domain.model.TaskItem;
+import com.example.habitrpg.R;
 import com.example.habitrpg.databinding.ItemTaskBinding;
 
 import java.text.SimpleDateFormat;
@@ -66,9 +67,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
         void bind(TaskItem task) {
             binding.tvTaskTitle.setText(task.getTitle());
-            binding.tvTaskMeta.setText(task.getCategoryName() + " • XP: " + task.getXpValue());
-            binding.tvTaskSchedule.setText(new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(new Date(task.getExecuteAt())));
-            binding.tvTaskStatus.setText(task.getStatus());
+
+            String typeLabel = TaskItem.TYPE_REPEATING.equals(task.getType()) ? "Ponavljajući" : "Jednokratan";
+            binding.tvTaskMeta.setText(task.getCategoryName() + " • " + typeLabel + " • XP " + task.getXpValue());
+            binding.tvTaskSchedule.setText("Termin: " + new SimpleDateFormat("dd.MM.yyyy • HH:mm", Locale.getDefault()).format(new Date(task.getExecuteAt())));
+
+            bindStatus(task.getStatus());
 
             boolean active = TaskItem.STATUS_ACTIVE.equals(task.getStatus());
             boolean paused = TaskItem.STATUS_PAUSED.equals(task.getStatus());
@@ -82,6 +86,28 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             binding.btnCancel.setOnClickListener(v -> listener.onSetCanceled(task.getId()));
             binding.btnPause.setOnClickListener(v -> listener.onSetPaused(task.getId()));
             binding.btnActivate.setOnClickListener(v -> listener.onSetActive(task.getId()));
+        }
+
+        private void bindStatus(String status) {
+            if (TaskItem.STATUS_ACTIVE.equals(status)) {
+                binding.tvTaskStatus.setText("AKTIVAN");
+                binding.tvTaskStatus.setBackgroundResource(R.drawable.bg_status_active);
+            } else if (TaskItem.STATUS_DONE.equals(status)) {
+                binding.tvTaskStatus.setText("URAĐEN");
+                binding.tvTaskStatus.setBackgroundResource(R.drawable.bg_status_done);
+            } else if (TaskItem.STATUS_PAUSED.equals(status)) {
+                binding.tvTaskStatus.setText("PAUZIRAN");
+                binding.tvTaskStatus.setBackgroundResource(R.drawable.bg_status_paused);
+            } else if (TaskItem.STATUS_CANCELED.equals(status)) {
+                binding.tvTaskStatus.setText("OTKAZAN");
+                binding.tvTaskStatus.setBackgroundResource(R.drawable.bg_status_canceled);
+            } else if (TaskItem.STATUS_NOT_DONE.equals(status)) {
+                binding.tvTaskStatus.setText("NEURAĐEN");
+                binding.tvTaskStatus.setBackgroundResource(R.drawable.bg_status_not_done);
+            } else {
+                binding.tvTaskStatus.setText(status);
+                binding.tvTaskStatus.setBackgroundResource(R.drawable.bg_status_chip);
+            }
         }
     }
 }
