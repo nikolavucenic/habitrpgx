@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.domain.model.TaskItem;
@@ -60,6 +61,10 @@ public class TaskCalendarFragment extends CoreFragment<FragmentTaskCalendarBindi
 
     private void setupList() {
         taskAdapter = new TaskAdapter(new TaskAdapter.TaskStatusListener() {
+            @Override public void onOpenDetails(String taskId) {
+                viewModel.handleAction(new TasksAction.SelectTask(taskId));
+                Navigation.findNavController(requireView()).navigate(com.example.habitrpg.R.id.nav_task_detail);
+            }
             @Override public void onSetDone(String taskId) { viewModel.handleAction(new TasksAction.ChangeStatus(taskId, TaskItem.STATUS_DONE)); }
             @Override public void onSetCanceled(String taskId) { viewModel.handleAction(new TasksAction.ChangeStatus(taskId, TaskItem.STATUS_CANCELED)); }
             @Override public void onSetPaused(String taskId) { viewModel.handleAction(new TasksAction.ChangeStatus(taskId, TaskItem.STATUS_PAUSED)); }

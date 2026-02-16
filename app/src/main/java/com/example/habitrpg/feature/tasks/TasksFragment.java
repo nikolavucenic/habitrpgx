@@ -58,6 +58,10 @@ public class TasksFragment extends CoreFragment<FragmentTasksBinding> {
             Navigation.findNavController(requireView()).navigate(R.id.action_tasks_to_calendar);
             return true;
         }
+        if (item.getItemId() == R.id.action_categories) {
+            Navigation.findNavController(requireView()).navigate(R.id.action_tasks_to_categories);
+            return true;
+        }
         return false;
     }
 
@@ -85,6 +89,10 @@ public class TasksFragment extends CoreFragment<FragmentTasksBinding> {
 
     private void setupList() {
         taskAdapter = new TaskAdapter(new TaskAdapter.TaskStatusListener() {
+            @Override public void onOpenDetails(String taskId) {
+                viewModel.handleAction(new TasksAction.SelectTask(taskId));
+                Navigation.findNavController(requireView()).navigate(R.id.action_tasks_to_detail);
+            }
             @Override public void onSetDone(String taskId) { viewModel.handleAction(new TasksAction.ChangeStatus(taskId, TaskItem.STATUS_DONE)); }
             @Override public void onSetCanceled(String taskId) { viewModel.handleAction(new TasksAction.ChangeStatus(taskId, TaskItem.STATUS_CANCELED)); }
             @Override public void onSetPaused(String taskId) { viewModel.handleAction(new TasksAction.ChangeStatus(taskId, TaskItem.STATUS_PAUSED)); }

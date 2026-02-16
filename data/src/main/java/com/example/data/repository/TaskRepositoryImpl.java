@@ -22,8 +22,6 @@ import javax.inject.Singleton;
 @Singleton
 public class TaskRepositoryImpl implements TaskRepository {
 
-    private static final long THREE_DAYS_MS = 3L * 24 * 60 * 60 * 1000;
-
     private final FirebaseAuth auth;
     private final FirebaseFirestore db;
 
@@ -143,6 +141,23 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
+    public CompletableFuture<Result<TaskItem>> getTaskById(String taskId) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) return CompletableFuture.completedFuture(new Result.Error<>("Nema aktivnog korisnika."));
+        CompletableFuture<Result<TaskItem>> future = new CompletableFuture<>();
+        db.collection("users").document(user.getUid()).collection("tasks").document(taskId).get()
+                .addOnSuccessListener(snapshot -> {
+                    if (!snapshot.exists()) {
+                        future.complete(new Result.Error<>("Zadatak ne postoji."));
+                        return;
+                    }
+                    future.complete(new Result.Success<>(mapTask(snapshot.getId(), snapshot.getData())));
+                })
+                .addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
+        return future;
+    }
+
+    @Override
     public CompletableFuture<Result<Void>> createTask(TaskItem taskItem) {
         CompletableFuture<Result<Void>> future = new CompletableFuture<>();
         FirebaseUser user = auth.getCurrentUser();
@@ -214,46 +229,20 @@ public class TaskRepositoryImpl implements TaskRepository {
                 future.complete(new Result.Error<>("Zadatak ne postoji."));
                 return;
             }
-            String currentStatus = snapshot.getString("status");
-            long executeAt = ((Number) snapshot.get("executeAt")).longValue();
-            long now = System.currentTimeMillis();
-
-            if (TaskItem.STATUS_NOT_DONE.equals(currentStatus) || TaskItem.STATUS_CANCELED.equals(currentStatus) || TaskItem.STATUS_DONE.equals(currentStatus)) {
-                future.complete(new Result.Error<>("Status zadatka se više ne može menjati."));
-                return;
-            }
-
-            if (TaskItem.STATUS_DONE.equals(newStatus)) {
-                if (executeAt > now) {
-                    future.complete(new Result.Error<>("Zadatak zakazan u budućnosti ne može biti označen kao urađen."));
-                    return;
-                }
-                if (now - executeAt > THREE_DAYS_MS) {
-                    taskRef.update("status", TaskItem.STATUS_NOT_DONE)
-                            .addOnSuccessListener(unused -> future.complete(new Result.Error<>("Prošao je rok od 3 dana. Zadatak je označen kao neurađen.")))
-                            .addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
-                    return;
-                }
-                int xp = ((Number) snapshot.get("xpValue")).intValue();
-                taskRef.update("status", TaskItem.STATUS_DONE, "awardedXp", xp, "doneAt", now)
-                        .addOnSuccessListener(unused -> incrementUserXp(user.getUid(), xp, future))
-                        .addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
-                return;
-            }
-
-            if (TaskItem.STATUS_PAUSED.equals(newStatus)) {
-                String type = snapshot.getString("type");
-                if (!TaskItem.TYPE_REPEATING.equals(type)) {
-                    future.complete(new Result.Error<>("Samo ponavljajući zadaci mogu biti pauzirani."));
-                    return;
-                }
-            }
-
             taskRef.update("status", newStatus)
                     .addOnSuccessListener(unused -> future.complete(new Result.Success<>(null)))
                     .addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
         }).addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
 
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<Result<Void>> incrementCurrentUserXp(int xp) {
+        CompletableFuture<Result<Void>> future = new CompletableFuture<>();
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) return CompletableFuture.completedFuture(new Result.Error<>("Nema aktivnog korisnika."));
+        incrementUserXp(user.getUid(), xp, future);
         return future;
     }
 
