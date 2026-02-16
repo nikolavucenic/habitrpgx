@@ -13,6 +13,7 @@ import com.example.domain.usecase.GetCategoriesUseCase;
 import com.example.domain.usecase.GetTasksUseCase;
 import com.example.habitrpg.core.CoreViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -46,6 +47,8 @@ public class TasksViewModel extends CoreViewModel<TasksUiState, TasksAction, Tas
     public void handleAction(TasksAction action) {
         if (action instanceof TasksAction.Load) {
             loadAll();
+        } else if (action instanceof TasksAction.OnFilterChanged) {
+            applyFilterAndEmit(((TasksAction.OnFilterChanged) action).filter);
         } else if (action instanceof TasksAction.CreateCategory) {
             createCategory((TasksAction.CreateCategory) action);
         } else if (action instanceof TasksAction.CreateTask) {
@@ -58,24 +61,81 @@ public class TasksViewModel extends CoreViewModel<TasksUiState, TasksAction, Tas
     private void loadAll() {
         TasksUiState current = state.getValue();
         if (current == null) return;
-        state.setValue(new TasksUiState.Loading(current.getCategories(), current.getTasks()));
+
+        state.setValue(new TasksUiState.Loading(
+                current.getCategories(),
+                current.getTasks(),
+                current.getFilteredTasks(),
+                current.getSelectedFilter()
+        ));
 
         getCategoriesUseCase.execute().thenAccept(categoriesResult -> {
             if (categoriesResult instanceof Result.Error) {
                 emitError(((Result.Error<List<TaskCategory>>) categoriesResult).message);
                 return;
             }
+
             List<TaskCategory> categories = ((Result.Success<List<TaskCategory>>) categoriesResult).data;
-            getTasksUseCase.execute().thenAccept(tasksResult -> {
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    if (tasksResult instanceof Result.Success) {
-                        state.setValue(new TasksUiState.Data(categories, ((Result.Success<List<TaskItem>>) tasksResult).data));
-                    } else {
-                        state.setValue(new TasksUiState.Error(categories, current.getTasks(), ((Result.Error<List<TaskItem>>) tasksResult).message));
-                    }
-                });
-            });
+            getTasksUseCase.execute().thenAccept(tasksResult ->
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        TasksUiState latest = state.getValue();
+                        int selectedFilter = latest == null ? TasksUiState.FILTER_ALL : latest.getSelectedFilter();
+
+                        if (tasksResult instanceof Result.Success) {
+                            List<TaskItem> tasks = ((Result.Success<List<TaskItem>>) tasksResult).data;
+                            state.setValue(new TasksUiState.Data(
+                                    categories,
+                                    tasks,
+                                    filterTasks(tasks, selectedFilter),
+                                    selectedFilter
+                            ));
+                        } else {
+                            List<TaskItem> fallbackTasks = latest == null ? new ArrayList<>() : latest.getTasks();
+                            state.setValue(new TasksUiState.Error(
+                                    categories,
+                                    fallbackTasks,
+                                    filterTasks(fallbackTasks, selectedFilter),
+                                    selectedFilter,
+                                    ((Result.Error<List<TaskItem>>) tasksResult).message
+                            ));
+                        }
+                    }));
         });
+    }
+
+    private void applyFilterAndEmit(int filter) {
+        TasksUiState current = state.getValue();
+        if (current == null) return;
+
+        List<TaskItem> filtered = filterTasks(current.getTasks(), filter);
+
+        if (current instanceof TasksUiState.Loading) {
+            state.setValue(new TasksUiState.Loading(current.getCategories(), current.getTasks(), filtered, filter));
+        } else if (current instanceof TasksUiState.Error) {
+            state.setValue(new TasksUiState.Error(
+                    current.getCategories(),
+                    current.getTasks(),
+                    filtered,
+                    filter,
+                    ((TasksUiState.Error) current).getMessage()
+            ));
+        } else {
+            state.setValue(new TasksUiState.Data(current.getCategories(), current.getTasks(), filtered, filter));
+        }
+    }
+
+    private List<TaskItem> filterTasks(List<TaskItem> source, int filter) {
+        List<TaskItem> filtered = new ArrayList<>();
+        for (TaskItem task : source) {
+            if (filter == TasksUiState.FILTER_ALL) {
+                filtered.add(task);
+            } else if (filter == TasksUiState.FILTER_ONE_TIME && TaskItem.TYPE_ONE_TIME.equals(task.getType())) {
+                filtered.add(task);
+            } else if (filter == TasksUiState.FILTER_REPEATING && TaskItem.TYPE_REPEATING.equals(task.getType())) {
+                filtered.add(task);
+            }
+        }
+        return filtered;
     }
 
     private void createCategory(TasksAction.CreateCategory action) {
@@ -83,6 +143,7 @@ public class TasksViewModel extends CoreViewModel<TasksUiState, TasksAction, Tas
             sideEffect.setValue(new TasksSideEffect.ShowToast("Naziv kategorije je obavezan."));
             return;
         }
+
         createCategoryUseCase.execute(action.name.trim(), action.colorHex.trim())
                 .thenAccept(result -> new Handler(Looper.getMainLooper()).post(() -> {
                     if (result instanceof Result.Success) {
@@ -122,7 +183,13 @@ public class TasksViewModel extends CoreViewModel<TasksUiState, TasksAction, Tas
         new Handler(Looper.getMainLooper()).post(() -> {
             TasksUiState current = state.getValue();
             if (current == null) return;
-            state.setValue(new TasksUiState.Error(current.getCategories(), current.getTasks(), message));
+            state.setValue(new TasksUiState.Error(
+                    current.getCategories(),
+                    current.getTasks(),
+                    current.getFilteredTasks(),
+                    current.getSelectedFilter(),
+                    message
+            ));
         });
     }
 }

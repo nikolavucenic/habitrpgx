@@ -19,9 +19,6 @@ import com.example.habitrpg.core.CoreFragment;
 import com.example.habitrpg.databinding.FragmentTasksBinding;
 import com.google.android.material.tabs.TabLayout;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
@@ -29,7 +26,6 @@ public class TasksFragment extends CoreFragment<FragmentTasksBinding> {
 
     private TasksViewModel viewModel;
     private TaskAdapter taskAdapter;
-    private List<TaskItem> allTasks = new ArrayList<>();
 
     @Override
     protected FragmentTasksBinding inflateBinding(LayoutInflater inflater, ViewGroup container) {
@@ -68,21 +64,21 @@ public class TasksFragment extends CoreFragment<FragmentTasksBinding> {
     private void setupTabs() {
         TabLayout tabs = getBinding().tabLayoutTasks;
         tabs.removeAllTabs();
-        tabs.addTab(tabs.newTab().setText(getString(R.string.tasks_filter_all)));
+        tabs.addTab(tabs.newTab().setText(getString(R.string.tasks_filter_all)), true);
         tabs.addTab(tabs.newTab().setText(getString(R.string.tasks_filter_one_time)));
         tabs.addTab(tabs.newTab().setText(getString(R.string.tasks_filter_repeating)));
 
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                applyFilter(tab.getPosition());
+                viewModel.handleAction(new TasksAction.OnFilterChanged(tab.getPosition()));
             }
 
             @Override public void onTabUnselected(TabLayout.Tab tab) {}
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-                applyFilter(tab.getPosition());
+                viewModel.handleAction(new TasksAction.OnFilterChanged(tab.getPosition()));
             }
         });
     }
@@ -107,12 +103,18 @@ public class TasksFragment extends CoreFragment<FragmentTasksBinding> {
     private void setupObservers() {
         viewModel.getState().observe(getViewLifecycleOwner(), state -> {
             getBinding().progressBar.setVisibility(state instanceof TasksUiState.Loading ? View.VISIBLE : View.GONE);
+            taskAdapter.submit(state.getFilteredTasks());
+            getBinding().tvEmptyTasks.setVisibility(state.getFilteredTasks().isEmpty() ? View.VISIBLE : View.GONE);
+
+            TabLayout tabs = getBinding().tabLayoutTasks;
+            if (tabs.getSelectedTabPosition() != state.getSelectedFilter() && state.getSelectedFilter() >= 0 && state.getSelectedFilter() < tabs.getTabCount()) {
+                TabLayout.Tab tab = tabs.getTabAt(state.getSelectedFilter());
+                if (tab != null) tab.select();
+            }
+
             if (state instanceof TasksUiState.Error) {
                 Toast.makeText(requireContext(), ((TasksUiState.Error) state).getMessage(), Toast.LENGTH_SHORT).show();
             }
-            allTasks = new ArrayList<>(state.getTasks());
-            int position = getBinding().tabLayoutTasks.getSelectedTabPosition();
-            applyFilter(position < 0 ? 0 : position);
         });
 
         viewModel.getEffect().observe(getViewLifecycleOwner(), effect -> {
@@ -120,20 +122,5 @@ public class TasksFragment extends CoreFragment<FragmentTasksBinding> {
                 Toast.makeText(requireContext(), ((TasksSideEffect.ShowToast) effect).message, Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private void applyFilter(int tabPosition) {
-        List<TaskItem> filtered = new ArrayList<>();
-        for (TaskItem task : allTasks) {
-            if (tabPosition == 0) {
-                filtered.add(task);
-            } else if (tabPosition == 1 && TaskItem.TYPE_ONE_TIME.equals(task.getType())) {
-                filtered.add(task);
-            } else if (tabPosition == 2 && TaskItem.TYPE_REPEATING.equals(task.getType())) {
-                filtered.add(task);
-            }
-        }
-        taskAdapter.submit(filtered);
-        getBinding().tvEmptyTasks.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
     }
 }

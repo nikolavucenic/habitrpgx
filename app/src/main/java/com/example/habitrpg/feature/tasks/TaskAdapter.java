@@ -75,7 +75,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             String slot = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(new Date(task.getExecuteAt()));
             binding.tvSlot.setText(slot);
 
-            String meta = task.getImportance() + " • " + task.getDifficulty() + " • XP " + task.getXpValue();
+            String meta = prettify(task.getImportance()) + " • " + prettify(task.getDifficulty()) + " • XP " + task.getXpValue();
             binding.tvMeta.setText(meta);
 
             try {
@@ -97,6 +97,23 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             binding.btnCancel.setOnClickListener(v -> listener.onSetCanceled(task.getId()));
             binding.btnPause.setOnClickListener(v -> listener.onSetPaused(task.getId()));
             binding.btnActivate.setOnClickListener(v -> listener.onSetActive(task.getId()));
+        }
+
+        private String prettify(String raw) {
+            if (raw == null || raw.trim().isEmpty()) return "-";
+            String normalized = raw.replace("_", " ").toLowerCase(Locale.getDefault());
+            StringBuilder sb = new StringBuilder();
+            boolean capitalize = true;
+            for (char c : normalized.toCharArray()) {
+                if (capitalize && Character.isLetter(c)) {
+                    sb.append(Character.toUpperCase(c));
+                    capitalize = false;
+                } else {
+                    sb.append(c);
+                }
+                if (c == ' ') capitalize = true;
+            }
+            return sb.toString();
         }
     }
 }
