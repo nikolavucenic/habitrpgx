@@ -55,21 +55,6 @@
     <string name="progression_importance_title">XP po bitnosti zadatka</string>
     <string name="progression_difficulty_title">XP po težini zadatka</string>
     <string name="progression_error_value">Napomena: %1$s</string>
-    <string name="progression_attack_button">Napad</string>
-    <string name="progression_activate_equipment">Aktiviraj opremu</string>
-    <string name="progression_boss_image">Ilustracija bosa</string>
-    <string name="progression_chest">Kovčeg sa nagradama</string>
-    <string name="progression_boss_title">Bos nivoa %1$d</string>
-    <string name="progression_boss_hp_value">HP bosa: %1$d / %2$d</string>
-    <string name="progression_pp_battle_value">PP u borbi: %1$d</string>
-    <string name="progression_equipment_value">Aktivna oprema: %1$s</string>
-    <string name="progression_success_rate">Šansa za pogodak: %1$d%%</string>
-    <string name="progression_attacks_left">Preostali napadi: %1$d/5</string>
-    <string name="progression_rewards">Nagrade: %1$d novčića%2$s</string>
-    <string name="progression_encounter_hint">Boss encounter je aktivan! Automatski ulaziš u borbu.</string>
-    <string name="progression_open_encounter">Uđi u boss battle</string>
-    <string name="boss_battle_screen_title">Boss Encounter</string>
-    <string name="boss_battle_title_value">Drevni Bos #%1$d</string>
 
     <string name="tasks_title">Zadaci</string>
     <string name="no_tasks_yet">Još uvek nema zadataka.</string>
