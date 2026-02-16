@@ -6,12 +6,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -47,6 +49,7 @@ public class CategoryManagementFragment extends CoreFragment<FragmentCategoryMan
 
         getBinding().toolbarCategories.setNavigationOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
         setupList();
+        setupFabInsets();
         getBinding().fabAddCategory.setOnClickListener(v -> showCreateDialog());
 
         viewModel.getState().observe(getViewLifecycleOwner(), state -> {
@@ -94,6 +97,18 @@ public class CategoryManagementFragment extends CoreFragment<FragmentCategoryMan
         categoryColorMap.put("Siva", "#4B5563");
     }
 
+    private void setupFabInsets() {
+        final int defaultFabMargin = 16;
+        ViewCompat.setOnApplyWindowInsetsListener(getBinding().fabAddCategory, (view, windowInsets) -> {
+            WindowInsetsCompat.Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+            int bottomMarginPx = Math.round(defaultFabMargin * view.getResources().getDisplayMetrics().density);
+            layoutParams.bottomMargin = bottomMarginPx + systemBars.bottom;
+            view.setLayoutParams(layoutParams);
+            return windowInsets;
+        });
+    }
+
     private void showCreateDialog() {
         showCategoryDialog("Nova kategorija", null, (name, hex) -> viewModel.handleAction(new TasksAction.CreateCategory(name, hex)));
     }
@@ -114,26 +129,38 @@ public class CategoryManagementFragment extends CoreFragment<FragmentCategoryMan
         if (existing != null) etName.setText(existing.getName());
         container.addView(etName);
 
-        AutoCompleteTextView actColor = new AutoCompleteTextView(requireContext());
+        Spinner spinnerColor = new Spinner(requireContext());
         List<String> colorNames = new ArrayList<>(categoryColorMap.keySet());
-        actColor.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, colorNames));
+        ArrayAdapter<String> colorAdapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                colorNames
+        );
+        colorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerColor.setAdapter(colorAdapter);
         if (existing != null) {
-            String selected = colorNames.get(0);
+            int selectedPosition = 0;
+            int index = 0;
             for (Map.Entry<String, String> e : categoryColorMap.entrySet()) {
-                if (e.getValue().equalsIgnoreCase(existing.getColorHex())) selected = e.getKey();
+                if (e.getValue().equalsIgnoreCase(existing.getColorHex())) {
+                    selectedPosition = index;
+                    break;
+                }
+                index++;
             }
-            actColor.setText(selected, false);
+            spinnerColor.setSelection(selectedPosition);
         } else if (!colorNames.isEmpty()) {
-            actColor.setText(colorNames.get(0), false);
+            spinnerColor.setSelection(0);
         }
-        container.addView(actColor);
+        container.addView(spinnerColor);
 
         new AlertDialog.Builder(requireContext())
                 .setTitle(title)
                 .setView(container)
                 .setPositiveButton("Sačuvaj", (d, w) -> {
                     String name = String.valueOf(etName.getText()).trim();
-                    String colorHex = categoryColorMap.getOrDefault(String.valueOf(actColor.getText()).trim(), "#5B5CE2");
+                    String selectedColor = String.valueOf(spinnerColor.getSelectedItem());
+                    String colorHex = categoryColorMap.getOrDefault(selectedColor, "#5B5CE2");
                     listener.onSubmit(name, colorHex);
                 })
                 .setNegativeButton("Otkaži", null)
