@@ -72,4 +72,7 @@ dependencies {
 
     // QR
     implementation(libs.zxing.android.embedded)
+
+    // SwipeRefresh
+    implementation(libs.androidx.swiperefreshlayout)
 }

@@ -278,9 +278,10 @@ public class TaskRepositoryImpl implements TaskRepository {
             updates.put("pp", pp);
             updates.put("title", ProgressionCalculator.titleForLevel(level));
 
+            boolean finalLeveledUp = leveledUp;
             userRef.update(updates)
                     .addOnSuccessListener(unused -> {
-                        if (leveledUp) {
+                        if (finalLeveledUp) {
                             sharedPreferences.edit().putBoolean(KEY_PENDING_BOSS_ENCOUNTER, true).apply();
                         }
                         future.complete(new Result.Success<>(null));

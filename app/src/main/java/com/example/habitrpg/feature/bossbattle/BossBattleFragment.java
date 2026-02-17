@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.CycleInterpolator;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -112,7 +113,7 @@ public class BossBattleFragment extends CoreFragment<FragmentBossBattleBinding> 
 
     private void handleEffect(BossBattleSideEffect effect) {
         if (effect instanceof BossBattleSideEffect.ShowToast) {
-            showToast(((BossBattleSideEffect.ShowToast) effect).message);
+            Toast.makeText(getContext(), ((BossBattleSideEffect.ShowToast) effect).message, Toast.LENGTH_SHORT).show();
         } else if (effect instanceof BossBattleSideEffect.PlayBossHitAnimation) {
             getBinding().ivBoss.setImageResource(R.drawable.ic_boss_hit);
             getBinding().ivBoss.postDelayed(() -> getBinding().ivBoss.setImageResource(R.drawable.ic_boss_idle), 250);
