@@ -25,6 +25,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 @HiltViewModel
 public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBattleAction, BossBattleSideEffect> {
 
+    private static final long ATTACK_COOLDOWN_MS = 300L;
+
     private final GetCurrentUserProfileUseCase getCurrentUserProfileUseCase;
     private final GetStageSuccessRateUseCase getStageSuccessRateUseCase;
     private final ApplyBossBattleRewardsUseCase applyBossBattleRewardsUseCase;
@@ -34,6 +36,7 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
     private final GetLastResolvedBossEncounterLevelUseCase getLastResolvedBossEncounterLevelUseCase;
     private final SaveLastResolvedBossEncounterLevelUseCase saveLastResolvedBossEncounterLevelUseCase;
     private final Random random = new Random();
+    private long lastAttackTimestamp;
 
     @Inject
     public BossBattleViewModel(GetCurrentUserProfileUseCase getCurrentUserProfileUseCase,
@@ -123,10 +126,14 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
     }
 
     private void processAttack() {
+        long now = System.currentTimeMillis();
+        if (now - lastAttackTimestamp < ATTACK_COOLDOWN_MS) return;
+
         BossBattleUiState current = state.getValue();
         BossBattleUiState.Data currentData = current != null ? current.getData() : null;
         if (currentData == null || current instanceof BossBattleUiState.Loading || currentData.battleFinished) return;
         if (currentData.attacksLeft <= 0) return;
+        lastAttackTimestamp = now;
 
         int attacksLeft = currentData.attacksLeft - 1;
         int roll = random.nextInt(100);

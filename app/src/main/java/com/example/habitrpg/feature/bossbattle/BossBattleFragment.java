@@ -115,7 +115,21 @@ public class BossBattleFragment extends CoreFragment<FragmentBossBattleBinding> 
             Toast.makeText(getContext(), ((BossBattleSideEffect.ShowToast) effect).message, Toast.LENGTH_SHORT).show();
         } else if (effect instanceof BossBattleSideEffect.PlayBossHitAnimation) {
             getBinding().ivBoss.setImageResource(R.drawable.ic_boss_hit);
-            getBinding().ivBoss.postDelayed(() -> getBinding().ivBoss.setImageResource(R.drawable.ic_boss_idle), 250);
+            ObjectAnimator hitAnimator = ObjectAnimator.ofFloat(getBinding().ivBoss,
+                    "translationX",
+                    0f,
+                    -22f,
+                    18f,
+                    -14f,
+                    10f,
+                    0f
+            );
+            hitAnimator.setDuration(220);
+            hitAnimator.start();
+            getBinding().ivBoss.postDelayed(() -> {
+                getBinding().ivBoss.setImageResource(R.drawable.ic_boss_idle);
+                getBinding().ivBoss.setTranslationX(0f);
+            }, 240);
         } else if (effect instanceof BossBattleSideEffect.PlayBossMissAnimation) {
             shakeView(getBinding().ivBoss);
         } else if (effect instanceof BossBattleSideEffect.PlayChestShakeAnimation) {
