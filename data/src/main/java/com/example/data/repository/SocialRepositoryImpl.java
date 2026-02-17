@@ -53,13 +53,21 @@ public class SocialRepositoryImpl implements SocialRepository {
 
     @Override
     public CompletableFuture<Result<List<SocialModels.Friend>>> searchUsers(String query) {
+        FirebaseUser current = auth.getCurrentUser();
+        if (current == null) return CompletableFuture.completedFuture(new Result.Error<>("Nema aktivnog korisnika."));
+
+        String normalized = query == null ? "" : query.trim();
+        if (normalized.isEmpty()) {
+            return CompletableFuture.completedFuture(new Result.Success<>(new ArrayList<>()));
+        }
+
         CompletableFuture<Result<List<SocialModels.Friend>>> future = new CompletableFuture<>();
-        db.collection("users").orderBy("username").startAt(query).endAt(query + "\uf8ff").limit(10).get()
-                .addOnSuccessListener(s -> {
+        db.collection("users").orderBy("username").startAt(normalized).endAt(normalized + "\uf8ff").limit(10).get()
+                .addOnSuccessListener(snapshot -> {
                     List<SocialModels.Friend> users = new ArrayList<>();
-                    String myUid = auth.getCurrentUser() == null ? "" : auth.getCurrentUser().getUid();
-                    s.getDocuments().forEach(d -> {
-                        if (!d.getId().equals(myUid)) {
+                    String myUid = current.getUid();
+                    snapshot.getDocuments().forEach(d -> {
+                        if (!myUid.equals(d.getId())) {
                             users.add(new SocialModels.Friend(
                                     d.getId(),
                                     d.getString("username") == null ? "" : d.getString("username"),
@@ -78,28 +86,25 @@ public class SocialRepositoryImpl implements SocialRepository {
         FirebaseUser current = auth.getCurrentUser();
         if (current == null) return CompletableFuture.completedFuture(new Result.Error<>("Nema aktivnog korisnika."));
         if (current.getUid().equals(targetUid)) return CompletableFuture.completedFuture(new Result.Error<>("Ne možete dodati sebe."));
+
         CompletableFuture<Result<Void>> future = new CompletableFuture<>();
         db.collection("users").document(targetUid).get().addOnSuccessListener(target -> {
             if (!target.exists()) {
                 future.complete(new Result.Error<>("Korisnik ne postoji."));
                 return;
             }
+
             String username = target.getString("username") == null ? "" : target.getString("username");
             int avatarId = target.getLong("avatarId") == null ? 1 : target.getLong("avatarId").intValue();
 
             Map<String, Object> friend = new HashMap<>();
             friend.put("username", username);
             friend.put("avatarId", avatarId);
+            friend.put("createdAt", System.currentTimeMillis());
 
-            db.collection("users").document(current.getUid()).collection("friends").document(targetUid).set(friend)
-                    .addOnSuccessListener(u -> db.collection("users").document(current.getUid()).get().addOnSuccessListener(me -> {
-                        Map<String, Object> reverse = new HashMap<>();
-                        reverse.put("username", me.getString("username") == null ? "" : me.getString("username"));
-                        reverse.put("avatarId", me.getLong("avatarId") == null ? 1 : me.getLong("avatarId").intValue());
-                        db.collection("users").document(targetUid).collection("friends").document(current.getUid()).set(reverse)
-                                .addOnSuccessListener(x -> future.complete(new Result.Success<>(null)))
-                                .addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
-                    }))
+            db.collection("users").document(current.getUid()).collection("friends").document(targetUid)
+                    .set(friend)
+                    .addOnSuccessListener(u -> future.complete(new Result.Success<>(null)))
                     .addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
         }).addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
 
@@ -202,10 +207,15 @@ public class SocialRepositoryImpl implements SocialRepository {
         CompletableFuture<Result<List<SocialModels.AllianceInvite>>> future = new CompletableFuture<>();
         db.collection("users").document(current.getUid()).collection("allianceInvites")
                 .whereEqualTo("status", "PENDING")
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .get().addOnSuccessListener(s -> {
+                .get().addOnSuccessListener(snapshot -> {
+                    List<com.google.firebase.firestore.DocumentSnapshot> docs = new ArrayList<>(snapshot.getDocuments());
+                    docs.sort((a, b) -> Long.compare(
+                            b.getLong("createdAt") == null ? 0L : b.getLong("createdAt"),
+                            a.getLong("createdAt") == null ? 0L : a.getLong("createdAt")
+                    ));
+
                     List<SocialModels.AllianceInvite> list = new ArrayList<>();
-                    s.getDocuments().forEach(d -> list.add(new SocialModels.AllianceInvite(
+                    docs.forEach(d -> list.add(new SocialModels.AllianceInvite(
                             d.getId(),
                             d.getString("allianceId") == null ? "" : d.getString("allianceId"),
                             d.getString("allianceName") == null ? "" : d.getString("allianceName"),
