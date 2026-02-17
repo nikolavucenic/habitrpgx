@@ -2,6 +2,7 @@ package com.example.habitrpg.di;
 
 import com.example.domain.repository.AuthRepository;
 import com.example.domain.repository.TaskRepository;
+import com.example.domain.repository.SocialRepository;
 import com.example.domain.usecase.ApplyBossBattleRewardsUseCase;
 import com.example.domain.usecase.ChangePasswordUseCase;
 import com.example.domain.usecase.ChangeTaskStatusUseCase;
@@ -28,6 +29,7 @@ import com.example.domain.usecase.SaveLastResolvedBossEncounterLevelUseCase;
 import com.example.domain.usecase.SetPendingBossEncounterUseCase;
 import com.example.domain.usecase.UpdateCategoryUseCase;
 import com.example.domain.usecase.UpdateTaskUseCase;
+import com.example.domain.usecase.SocialUseCase;
 
 import javax.inject.Singleton;
 
@@ -194,5 +196,11 @@ public class UseCaseModule {
     @Singleton
     public ChangeTaskStatusUseCase provideChangeTaskStatusUseCase(TaskRepository taskRepository) {
         return new ChangeTaskStatusUseCase(taskRepository);
+    }
+
+    @Provides
+    @Singleton
+    public SocialUseCase provideSocialUseCase(SocialRepository socialRepository) {
+        return new SocialUseCase(socialRepository);
     }
 }
