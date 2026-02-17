@@ -84,6 +84,17 @@
         android:id="@+id/nav_progression"
         android:name="com.example.habitrpg.feature.progression.ProgressionFragment"
         android:label="fragment_progression"
-        tools:layout="@layout/fragment_progression" />
+        tools:layout="@layout/fragment_progression">
+
+        <action
+            android:id="@+id/action_progression_to_boss_battle"
+            app:destination="@id/nav_boss_battle" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_boss_battle"
+        android:name="com.example.habitrpg.feature.bossbattle.BossBattleFragment"
+        android:label="fragment_boss_battle"
+        tools:layout="@layout/fragment_boss_battle" />
 
 </navigation>

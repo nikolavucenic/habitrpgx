@@ -1,5 +1,6 @@
 package com.example.habitrpg.feature.progression;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,17 +9,26 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.habitrpg.R;
 import com.example.habitrpg.core.CoreFragment;
 import com.example.habitrpg.databinding.FragmentProgressionBinding;
+
+import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding> {
 
+    private static final String KEY_PENDING_BOSS_ENCOUNTER = "pending_boss_encounter";
+
+    @Inject
+    SharedPreferences sharedPreferences;
+
     private ProgressionViewModel viewModel;
+    private boolean autoNavigationHandled;
 
     @Override
     protected FragmentProgressionBinding inflateBinding(LayoutInflater inflater, ViewGroup container) {
@@ -30,6 +40,8 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
         super.onViewCreated(view, savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(ProgressionViewModel.class);
+        getBinding().btnStartBossBattle.setOnClickListener(v -> NavHostFragment.findNavController(this)
+                .navigate(R.id.action_progression_to_boss_battle));
         viewModel.getState().observe(getViewLifecycleOwner(), state -> {
             ProgressionUiState.Data data = state.getData();
 
@@ -52,9 +64,23 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
             } else {
                 getBinding().tvError.setVisibility(View.GONE);
             }
+
+            maybeNavigateToPendingBoss(state);
         });
 
         viewModel.load();
+    }
+
+    private void maybeNavigateToPendingBoss(ProgressionUiState state) {
+        if (autoNavigationHandled) return;
+        if (!(state instanceof ProgressionUiState.Success)) return;
+
+        boolean pendingBoss = sharedPreferences.getBoolean(KEY_PENDING_BOSS_ENCOUNTER, false);
+        if (!pendingBoss) return;
+
+        autoNavigationHandled = true;
+        sharedPreferences.edit().putBoolean(KEY_PENDING_BOSS_ENCOUNTER, false).apply();
+        NavHostFragment.findNavController(this).navigate(R.id.action_progression_to_boss_battle);
     }
 
     private int getAvatarDrawable(int avatarId) {

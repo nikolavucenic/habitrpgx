@@ -11,6 +11,7 @@ import com.example.domain.usecase.DeleteTaskUseCase;
 import com.example.domain.usecase.GetCategoriesUseCase;
 import com.example.domain.usecase.GetCurrentUserProfileUseCase;
 import com.example.domain.usecase.GetTasksUseCase;
+import com.example.domain.usecase.GetStageSuccessRateUseCase;
 import com.example.domain.usecase.LoginUseCase;
 import com.example.domain.usecase.LogoutUseCase;
 import com.example.domain.usecase.RegisterUseCase;
@@ -104,6 +105,12 @@ public class UseCaseModule {
     @Singleton
     public DeleteCategoryUseCase provideDeleteCategoryUseCase(TaskRepository taskRepository) {
         return new DeleteCategoryUseCase(taskRepository);
+    }
+
+    @Provides
+    @Singleton
+    public GetStageSuccessRateUseCase provideGetStageSuccessRateUseCase(TaskRepository taskRepository) {
+        return new GetStageSuccessRateUseCase(taskRepository);
     }
 
     @Provides
