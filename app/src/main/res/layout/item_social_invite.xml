@@ -28,14 +28,14 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Odbij" />
+            android:text="@string/social_decline_button" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAccept"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="Prihvati" />
+            android:text="@string/social_accept_button" />
     </LinearLayout>
 
 </LinearLayout>

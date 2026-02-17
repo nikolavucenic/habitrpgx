@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.domain.model.SocialModels;
+import com.example.habitrpg.R;
 import com.example.habitrpg.core.CoreFragment;
 import com.example.habitrpg.databinding.FragmentSocialBinding;
 import com.example.habitrpg.databinding.ItemSocialFriendBinding;
@@ -47,7 +48,7 @@ public class SocialFragment extends CoreFragment<FragmentSocialBinding> {
         getBinding().btnCreateAlliance.setOnClickListener(v -> {
             String name = textOf(getBinding().etAllianceName).trim();
             if (name.isEmpty()) {
-                Toast.makeText(requireContext(), "Unesite naziv saveza", Toast.LENGTH_SHORT).show();
+                showToast(getString(R.string.social_toast_alliance_name_required));
                 return;
             }
             viewModel.handleAction(new SocialAction.CreateAlliance(name));
@@ -63,7 +64,9 @@ public class SocialFragment extends CoreFragment<FragmentSocialBinding> {
         viewModel.getState().observe(getViewLifecycleOwner(), this::render);
         viewModel.getEffect().observe(getViewLifecycleOwner(), effect -> {
             if (effect instanceof SocialSideEffect.ShowToast) {
-                Toast.makeText(requireContext(), ((SocialSideEffect.ShowToast) effect).message, Toast.LENGTH_SHORT).show();
+                SocialSideEffect.ShowToast toast = (SocialSideEffect.ShowToast) effect;
+                if (toast.messageRes != 0) showToast(getString(toast.messageRes));
+                else if (toast.message != null && !toast.message.trim().isEmpty()) showToast(toast.message);
             }
         });
 
@@ -71,101 +74,105 @@ public class SocialFragment extends CoreFragment<FragmentSocialBinding> {
     }
 
     private void render(SocialUiState state) {
-        getBinding().loading.setVisibility(state.loading ? View.VISIBLE : View.GONE);
+        SocialUiState.Data data = state.getData();
+        getBinding().loading.setVisibility(state instanceof SocialUiState.Loading ? View.VISIBLE : View.GONE);
 
-        renderSearchResults(state);
-        renderFriends(state);
-        renderInvites(state);
-        renderAlliance(state);
-        renderMessages(state);
+        if (state instanceof SocialUiState.Error && data.error != null && !data.error.trim().isEmpty()) {
+            showToast(data.error);
+        }
+
+        renderSearchResults(data);
+        renderFriends(data);
+        renderInvites(data);
+        renderAlliance(data);
+        renderMessages(data);
     }
 
-    private void renderSearchResults(SocialUiState state) {
+    private void renderSearchResults(SocialUiState.Data data) {
         getBinding().containerSearchResults.removeAllViews();
-        getBinding().tvSearchEmpty.setVisibility(state.searchResults.isEmpty() ? View.VISIBLE : View.GONE);
+        getBinding().tvSearchEmpty.setVisibility(data.searchResults.isEmpty() ? View.VISIBLE : View.GONE);
 
         LayoutInflater inflater = LayoutInflater.from(requireContext());
-        for (SocialModels.Friend user : state.searchResults) {
+        for (SocialModels.Friend user : data.searchResults) {
             ItemSocialSearchBinding row = ItemSocialSearchBinding.inflate(inflater, getBinding().containerSearchResults, false);
-            row.tvUsername.setText(user.username + "  (" + user.uid + ")");
+            row.tvUsername.setText(getString(R.string.social_search_result_value, user.username, user.uid));
             row.btnAdd.setOnClickListener(v -> viewModel.handleAction(new SocialAction.AddFriend(user.uid)));
             getBinding().containerSearchResults.addView(row.getRoot());
         }
     }
 
-    private void renderFriends(SocialUiState state) {
+    private void renderFriends(SocialUiState.Data data) {
         getBinding().containerFriends.removeAllViews();
-        getBinding().tvFriendsEmpty.setVisibility(state.friends.isEmpty() ? View.VISIBLE : View.GONE);
+        getBinding().tvFriendsEmpty.setVisibility(data.friends.isEmpty() ? View.VISIBLE : View.GONE);
 
         LayoutInflater inflater = LayoutInflater.from(requireContext());
-        for (SocialModels.Friend friend : state.friends) {
+        for (SocialModels.Friend friend : data.friends) {
             ItemSocialFriendBinding row = ItemSocialFriendBinding.inflate(inflater, getBinding().containerFriends, false);
             row.tvUsername.setText(friend.username);
-            row.tvMeta.setText("avatar #" + friend.avatarId);
+            row.tvMeta.setText(getString(R.string.social_friend_avatar_value, friend.avatarId));
             getBinding().containerFriends.addView(row.getRoot());
         }
     }
 
-    private void renderInvites(SocialUiState state) {
+    private void renderInvites(SocialUiState.Data data) {
         getBinding().containerInvites.removeAllViews();
-        getBinding().tvInvitesEmpty.setVisibility(state.invites.isEmpty() ? View.VISIBLE : View.GONE);
+        getBinding().tvInvitesEmpty.setVisibility(data.invites.isEmpty() ? View.VISIBLE : View.GONE);
 
         LayoutInflater inflater = LayoutInflater.from(requireContext());
-        for (SocialModels.AllianceInvite invite : state.invites) {
+        for (SocialModels.AllianceInvite invite : data.invites) {
             ItemSocialInviteBinding row = ItemSocialInviteBinding.inflate(inflater, getBinding().containerInvites, false);
             row.tvTitle.setText(invite.allianceName);
-            row.tvSubtitle.setText("Pozvao: " + invite.fromUsername);
+            row.tvSubtitle.setText(getString(R.string.social_invite_from_value, invite.fromUsername));
             row.btnAccept.setOnClickListener(v -> viewModel.handleAction(new SocialAction.AcceptInvite(invite.id)));
             row.btnDecline.setOnClickListener(v -> viewModel.handleAction(new SocialAction.DeclineInvite(invite.id)));
             getBinding().containerInvites.addView(row.getRoot());
         }
     }
 
-    private void renderAlliance(SocialUiState state) {
-        if (state.alliance == null) {
-            getBinding().tvAllianceTitle.setText("Niste član saveza");
-            getBinding().tvAllianceMeta.setText("Prihvatite pozivnicu ili kreirajte novi savez.");
+    private void renderAlliance(SocialUiState.Data data) {
+        if (data.alliance == null) {
+            getBinding().tvAllianceTitle.setText(R.string.social_alliance_none_title);
+            getBinding().tvAllianceMeta.setText(R.string.social_alliance_none_subtitle);
             getBinding().progressBoss.setVisibility(View.GONE);
             getBinding().tvBossHp.setVisibility(View.GONE);
             return;
         }
 
-        getBinding().tvAllianceTitle.setText("Savez: " + state.alliance.name);
-        getBinding().tvAllianceMeta.setText(String.format(Locale.getDefault(), "Vođa: %s • Članovi: %d • %s",
-                state.alliance.leaderUsername,
-                state.alliance.members.size(),
-                state.alliance.missionActive ? "Misija aktivna" : "Misija nije pokrenuta"));
+        getBinding().tvAllianceTitle.setText(getString(R.string.social_alliance_title_value, data.alliance.name));
+        getBinding().tvAllianceMeta.setText(String.format(Locale.getDefault(), "%s • %s • %s",
+                getString(R.string.social_alliance_leader_value, data.alliance.leaderUsername),
+                getString(R.string.social_alliance_members_value, data.alliance.members.size()),
+                data.alliance.missionActive ? getString(R.string.social_alliance_mission_active) : getString(R.string.social_alliance_mission_inactive)));
 
-        if (state.alliance.missionActive && state.alliance.bossMaxHp > 0) {
+        if (data.alliance.missionActive && data.alliance.bossMaxHp > 0) {
             getBinding().progressBoss.setVisibility(View.VISIBLE);
             getBinding().tvBossHp.setVisibility(View.VISIBLE);
-            getBinding().progressBoss.setMax(state.alliance.bossMaxHp);
-            getBinding().progressBoss.setProgress(Math.max(0, state.alliance.bossHp));
-            getBinding().tvBossHp.setText("Boss HP: " + state.alliance.bossHp + " / " + state.alliance.bossMaxHp);
+            getBinding().progressBoss.setMax(data.alliance.bossMaxHp);
+            getBinding().progressBoss.setProgress(Math.max(0, data.alliance.bossHp));
+            getBinding().tvBossHp.setText(getString(R.string.social_boss_hp_value, data.alliance.bossHp, data.alliance.bossMaxHp));
         } else {
             getBinding().progressBoss.setVisibility(View.GONE);
             getBinding().tvBossHp.setVisibility(View.GONE);
         }
     }
 
-    private void renderMessages(SocialUiState state) {
+    private void renderMessages(SocialUiState.Data data) {
         getBinding().containerMessages.removeAllViews();
-        getBinding().tvMessagesEmpty.setVisibility(state.messages.isEmpty() ? View.VISIBLE : View.GONE);
+        getBinding().tvMessagesEmpty.setVisibility(data.messages.isEmpty() ? View.VISIBLE : View.GONE);
 
         String myUid = FirebaseAuth.getInstance().getCurrentUser() == null ? "" : FirebaseAuth.getInstance().getCurrentUser().getUid();
         LayoutInflater inflater = LayoutInflater.from(requireContext());
-        for (SocialModels.AllianceMessage message : state.messages) {
+        for (SocialModels.AllianceMessage message : data.messages) {
             ItemSocialMessageBinding row = ItemSocialMessageBinding.inflate(inflater, getBinding().containerMessages, false);
             boolean mine = message.senderUid.equals(myUid);
 
             row.tvBubble.setText(message.message);
-            row.tvMeta.setText(message.senderUsername + " • " + DateFormat.format("dd.MM HH:mm", new Date(message.createdAt)));
+            row.tvMeta.setText(getString(R.string.social_message_meta_value,
+                    message.senderUsername,
+                    DateFormat.format("dd.MM HH:mm", new Date(message.createdAt))));
 
-            ((ViewGroup.MarginLayoutParams) row.tvBubble.getLayoutParams()).setMargins(0, 0, 0, 0);
-            ((ViewGroup.MarginLayoutParams) row.tvMeta.getLayoutParams()).setMargins(0, 4, 0, 0);
             row.root.setGravity(mine ? Gravity.END : Gravity.START);
             row.tvBubble.setBackgroundResource(mine ? android.R.drawable.dialog_holo_light_frame : android.R.drawable.editbox_background_normal);
-
             row.tvMeta.setTextAlignment(mine ? TextView.TEXT_ALIGNMENT_VIEW_END : TextView.TEXT_ALIGNMENT_VIEW_START);
             getBinding().containerMessages.addView(row.getRoot());
         }
@@ -173,5 +180,9 @@ public class SocialFragment extends CoreFragment<FragmentSocialBinding> {
 
     private String textOf(TextView view) {
         return view.getText() == null ? "" : view.getText().toString();
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
     }
 }

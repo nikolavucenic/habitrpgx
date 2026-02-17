@@ -26,7 +26,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Savez"
+                    android:text="@string/social_screen_title"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
@@ -34,7 +34,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Prijatelji, pozivnice, misija i chat na jednom mestu"
+                    android:text="@string/social_screen_subtitle"
                     android:textColor="#666666" />
 
                 <ProgressBar
@@ -62,7 +62,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Pronađi prijatelje"
+                    android:text="@string/social_search_section_title"
                     android:textStyle="bold" />
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -74,7 +74,7 @@
                         android:id="@+id/etSearch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Username ili UID" />
+                        android:hint="@string/social_search_hint" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <LinearLayout
@@ -89,14 +89,14 @@
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Pretraži" />
+                        android:text="@string/social_search_button" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnRefresh"
                         style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Osveži" />
+                        android:text="@string/social_refresh_button" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -111,7 +111,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Nema rezultata pretrage."
+                    android:text="@string/social_search_empty"
                     android:textColor="#777777"
                     android:visibility="gone" />
             </LinearLayout>
@@ -132,7 +132,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Moji prijatelji"
+                    android:text="@string/social_friends_section_title"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -146,7 +146,7 @@
                     android:id="@+id/tvFriendsEmpty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Nema prijatelja."
+                    android:text="@string/social_friends_empty"
                     android:textColor="#777777"
                     android:visibility="gone" />
             </LinearLayout>
@@ -167,7 +167,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Kreiranje saveza"
+                    android:text="@string/social_create_section_title"
                     android:textStyle="bold" />
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -179,14 +179,14 @@
                         android:id="@+id/etAllianceName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Naziv saveza" />
+                        android:hint="@string/social_alliance_name_hint" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Poziv će biti poslat svim prijateljima"
+                    android:text="@string/social_create_subtitle"
                     android:textColor="#777777" />
 
                 <com.google.android.material.button.MaterialButton
@@ -194,7 +194,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Kreiraj savez" />
+                    android:text="@string/social_create_button" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -213,7 +213,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Pozivnice"
+                    android:text="@string/social_invites_section_title"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -227,7 +227,7 @@
                     android:id="@+id/tvInvitesEmpty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Nema aktivnih pozivnica."
+                    android:text="@string/social_invites_empty"
                     android:textColor="#777777"
                     android:visibility="gone" />
             </LinearLayout>
@@ -249,7 +249,7 @@
                     android:id="@+id/tvAllianceTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Niste član saveza"
+                    android:text="@string/social_alliance_none_title"
                     android:textStyle="bold" />
 
                 <TextView
@@ -283,7 +283,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Pokreni specijalnu misiju" />
+                    android:text="@string/social_start_mission_button" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -303,7 +303,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Chat saveza"
+                    android:text="@string/social_chat_section_title"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -317,7 +317,7 @@
                     android:id="@+id/tvMessagesEmpty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Nema poruka."
+                    android:text="@string/social_messages_empty"
                     android:textColor="#777777"
                     android:visibility="gone" />
 
@@ -330,7 +330,7 @@
                         android:id="@+id/etMessage"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Napiši poruku" />
+                        android:hint="@string/social_message_hint" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.button.MaterialButton
@@ -338,7 +338,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:text="Pošalji" />
+                    android:text="@string/social_send_button" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
