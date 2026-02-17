@@ -43,40 +43,66 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public boolean isPendingBossEncounter() {
-        return sharedPreferences.getBoolean(KEY_PENDING_BOSS_ENCOUNTER, false);
+        String key = scopedKey(KEY_PENDING_BOSS_ENCOUNTER);
+        if (!sharedPreferences.contains(key) && sharedPreferences.contains(KEY_PENDING_BOSS_ENCOUNTER)) {
+            boolean legacyValue = sharedPreferences.getBoolean(KEY_PENDING_BOSS_ENCOUNTER, false);
+            sharedPreferences.edit().putBoolean(key, legacyValue).apply();
+        }
+        return sharedPreferences.getBoolean(key, false);
     }
 
     @Override
     public void setPendingBossEncounter(boolean pending) {
-        sharedPreferences.edit().putBoolean(KEY_PENDING_BOSS_ENCOUNTER, pending).apply();
+        sharedPreferences.edit().putBoolean(scopedKey(KEY_PENDING_BOSS_ENCOUNTER), pending).apply();
     }
 
     @Override
     public int getLastResolvedBossEncounterLevel() {
-        return sharedPreferences.getInt(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL, 0);
+        String key = scopedKey(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL);
+        if (!sharedPreferences.contains(key) && sharedPreferences.contains(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL)) {
+            int legacyValue = sharedPreferences.getInt(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL, 0);
+            sharedPreferences.edit().putInt(key, legacyValue).apply();
+        }
+        return sharedPreferences.getInt(key, 0);
     }
 
     @Override
     public void saveLastResolvedBossEncounterLevel(int encounterLevel) {
-        sharedPreferences.edit().putInt(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL, encounterLevel).apply();
+        sharedPreferences.edit().putInt(scopedKey(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL), encounterLevel).apply();
     }
 
     @Override
     public int getBossNumber() {
-        return sharedPreferences.getInt(KEY_BOSS_NUMBER, 0);
+        String key = scopedKey(KEY_BOSS_NUMBER);
+        if (!sharedPreferences.contains(key) && sharedPreferences.contains(KEY_BOSS_NUMBER)) {
+            int legacyValue = sharedPreferences.getInt(KEY_BOSS_NUMBER, 0);
+            sharedPreferences.edit().putInt(key, legacyValue).apply();
+        }
+        return sharedPreferences.getInt(key, 0);
     }
 
     @Override
     public int getBossHp() {
-        return sharedPreferences.getInt(KEY_BOSS_HP, 0);
+        String key = scopedKey(KEY_BOSS_HP);
+        if (!sharedPreferences.contains(key) && sharedPreferences.contains(KEY_BOSS_HP)) {
+            int legacyValue = sharedPreferences.getInt(KEY_BOSS_HP, 0);
+            sharedPreferences.edit().putInt(key, legacyValue).apply();
+        }
+        return sharedPreferences.getInt(key, 0);
     }
 
     @Override
     public void saveBossState(int bossNumber, int hp) {
         sharedPreferences.edit()
-                .putInt(KEY_BOSS_NUMBER, bossNumber)
-                .putInt(KEY_BOSS_HP, hp)
+                .putInt(scopedKey(KEY_BOSS_NUMBER), bossNumber)
+                .putInt(scopedKey(KEY_BOSS_HP), hp)
                 .apply();
+    }
+
+    private String scopedKey(String baseKey) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) return baseKey;
+        return baseKey + "_" + user.getUid();
     }
 
     @Override

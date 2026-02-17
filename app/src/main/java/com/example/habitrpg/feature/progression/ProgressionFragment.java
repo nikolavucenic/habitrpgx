@@ -30,6 +30,7 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
     @Inject
     SetPendingBossEncounterUseCase setPendingBossEncounterUseCase;
 
+
     @Inject
     GetLastResolvedBossEncounterLevelUseCase getLastResolvedBossEncounterLevelUseCase;
 
@@ -46,8 +47,7 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
         super.onViewCreated(view, savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(ProgressionViewModel.class);
-        getBinding().btnStartBossBattle.setOnClickListener(v -> NavHostFragment.findNavController(this)
-                .navigate(R.id.action_progression_to_boss_battle));
+        getBinding().btnStartBossBattle.setOnClickListener(v -> startBossEncounter());
         viewModel.getState().observe(getViewLifecycleOwner(), state -> {
             ProgressionUiState.Data data = state.getData();
 
@@ -63,8 +63,10 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
             getBinding().tvXpNeeded.setText(getString(R.string.progression_xp_needed_value, remaining));
             getBinding().tvImportanceValues.setText(data.importancePreview);
             getBinding().tvDifficultyValues.setText(data.difficultyPreview);
+            boolean pendingBossEncounter = isPendingBossEncounterUseCase.execute();
             int lockedBossEncounterLevel = getLastResolvedBossEncounterLevelUseCase.execute();
-            boolean canStartBossEncounter = data.canStartBossEncounter && data.level > lockedBossEncounterLevel;
+            boolean canStartBossEncounter = data.canStartBossEncounter
+                    && (pendingBossEncounter || data.level > lockedBossEncounterLevel);
             getBinding().btnStartBossBattle.setVisibility(canStartBossEncounter ? View.VISIBLE : View.GONE);
 
             if (state instanceof ProgressionUiState.Error) {
@@ -86,11 +88,13 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
 
         boolean pendingBoss = isPendingBossEncounterUseCase.execute();
         if (!pendingBoss) return;
-        int lockedBossEncounterLevel = getLastResolvedBossEncounterLevelUseCase.execute();
-        boolean canStartBossEncounter = state.getData().canStartBossEncounter && state.getData().level > lockedBossEncounterLevel;
-        if (!canStartBossEncounter) return;
+        if (!state.getData().canStartBossEncounter) return;
 
         autoNavigationHandled = true;
+        startBossEncounter();
+    }
+
+    private void startBossEncounter() {
         setPendingBossEncounterUseCase.execute(false);
         NavHostFragment.findNavController(this).navigate(R.id.action_progression_to_boss_battle);
     }
