@@ -27,6 +27,7 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
     IsPendingBossEncounterUseCase isPendingBossEncounterUseCase;
 
 
+
     @Inject
     GetLastResolvedBossEncounterLevelUseCase getLastResolvedBossEncounterLevelUseCase;
 
@@ -43,8 +44,7 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
         super.onViewCreated(view, savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(ProgressionViewModel.class);
-        getBinding().btnStartBossBattle.setOnClickListener(v -> NavHostFragment.findNavController(this)
-                .navigate(R.id.action_progression_to_boss_battle));
+        getBinding().btnStartBossBattle.setOnClickListener(v -> startBossEncounter());
         viewModel.getState().observe(getViewLifecycleOwner(), state -> {
             ProgressionUiState.Data data = state.getData();
 
@@ -88,6 +88,11 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
         if (!state.getData().canStartBossEncounter) return;
 
         autoNavigationHandled = true;
+        startBossEncounter();
+    }
+
+    private void startBossEncounter() {
+        setPendingBossEncounterUseCase.execute(false);
         NavHostFragment.findNavController(this).navigate(R.id.action_progression_to_boss_battle);
     }
 
