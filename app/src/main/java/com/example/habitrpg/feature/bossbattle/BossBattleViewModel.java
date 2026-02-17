@@ -16,6 +16,8 @@ import com.example.domain.usecase.SaveBossStateUseCase;
 import com.example.domain.usecase.SaveEquipmentStateUseCase;
 import com.example.domain.usecase.SaveLastResolvedBossEncounterLevelUseCase;
 import com.example.habitrpg.core.CoreViewModel;
+import com.example.domain.usecase.SocialUseCase;
+import com.example.domain.model.SpecialMissionEvent;
 import com.example.habitrpg.feature.equipment.EquipmentManager;
 
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
     private final SaveEquipmentStateUseCase saveEquipmentStateUseCase;
     private final GetLastResolvedBossEncounterLevelUseCase getLastResolvedBossEncounterLevelUseCase;
     private final SaveLastResolvedBossEncounterLevelUseCase saveLastResolvedBossEncounterLevelUseCase;
+    private final SocialUseCase socialUseCase;
     private final Random random = new Random();
     private long lastAttackTimestamp;
 
@@ -51,7 +54,8 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
                                SaveBossStateUseCase saveBossStateUseCase,
                                SaveEquipmentStateUseCase saveEquipmentStateUseCase,
                                GetLastResolvedBossEncounterLevelUseCase getLastResolvedBossEncounterLevelUseCase,
-                               SaveLastResolvedBossEncounterLevelUseCase saveLastResolvedBossEncounterLevelUseCase) {
+                               SaveLastResolvedBossEncounterLevelUseCase saveLastResolvedBossEncounterLevelUseCase,
+                               SocialUseCase socialUseCase) {
         this.getCurrentUserProfileUseCase = getCurrentUserProfileUseCase;
         this.getStageSuccessRateUseCase = getStageSuccessRateUseCase;
         this.applyBossBattleRewardsUseCase = applyBossBattleRewardsUseCase;
@@ -61,6 +65,7 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
         this.saveEquipmentStateUseCase = saveEquipmentStateUseCase;
         this.getLastResolvedBossEncounterLevelUseCase = getLastResolvedBossEncounterLevelUseCase;
         this.saveLastResolvedBossEncounterLevelUseCase = saveLastResolvedBossEncounterLevelUseCase;
+        this.socialUseCase = socialUseCase;
         state.setValue(new BossBattleUiState.Loading(BossBattleUiState.initialData()));
     }
 
@@ -164,7 +169,7 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
         boolean hit = random.nextInt(100) < d.successChance;
         int nextHp = d.bossCurrentHp;
         String message;
-        if (hit) { nextHp = Math.max(0, nextHp - d.userPp); message = "Pogodak!"; sideEffect.setValue(new BossBattleSideEffect.PlayBossHitAnimation()); }
+        if (hit) { nextHp = Math.max(0, nextHp - d.userPp); message = "Pogodak!"; sideEffect.setValue(new BossBattleSideEffect.PlayBossHitAnimation()); socialUseCase.trackMissionEvent(SpecialMissionEvent.REGULAR_BOSS_HIT, 1); }
         else { message = "Promašaj!"; sideEffect.setValue(new BossBattleSideEffect.PlayBossMissAnimation()); }
 
         boolean finished = nextHp <= 0 || attacksLeft == 0;
