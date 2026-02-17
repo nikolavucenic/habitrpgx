@@ -23,6 +23,21 @@
     <string name="profile">Profil</string>
     <string name="tasks">Zadaci</string>
     <string name="shop">Prodavnica</string>
+    <string name="shop_title">Kovačnica i Alhemija</string>
+    <string name="shop_subtitle">Kupuj napitke i odeću pre sledećeg susreta sa bosom.</string>
+    <string name="shop_coins_value">Novčići: %1$d</string>
+    <string name="shop_purchase_success">Kupljeno: %1$s</string>
+    <string name="shop_not_enough_coins">Nemate dovoljno novčića.</string>
+    <string name="shop_potions_title">Napitci</string>
+    <string name="shop_clothing_title">Odeća</string>
+    <string name="shop_item_potion20">Napitak +20%% PP (50 novčića)</string>
+    <string name="shop_item_potion40">Napitak +40%% PP (70 novčića)</string>
+    <string name="shop_item_potion_perm5">Napitak +5%% PP trajno (200 novčića)</string>
+    <string name="shop_item_potion_perm10">Napitak +10%% PP trajno (1000 novčića)</string>
+    <string name="shop_item_gloves">Rukavice +10%% snage (60 novčića)</string>
+    <string name="shop_item_shield">Štit +10%% šanse (60 novčića)</string>
+    <string name="shop_item_boots">Čizme +1 napad (80 novčića)</string>
+
     <string name="alliance">Savez</string>
     <string name="progression_tab">Napredovanje</string>
 

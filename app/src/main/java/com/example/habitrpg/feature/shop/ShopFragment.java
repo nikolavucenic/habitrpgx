@@ -47,14 +47,14 @@ public class ShopFragment extends CoreFragment<FragmentShopBinding> {
         int bossBase = 100;
         int cost = (int) Math.round(bossBase * (pricePercent / 100f));
         if (state != null && state.getData().coins < cost) {
-            Toast.makeText(getContext(), "Nemate dovoljno novčića.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(com.example.habitrpg.R.string.shop_not_enough_coins), Toast.LENGTH_SHORT).show();
             return;
         }
         viewModel.handleAction(new ShopAction.OnBuyClicked(itemId, cost));
     }
 
     private void render(ShopUiState state) {
-        getBinding().tvCoins.setText("Novčići: " + state.getData().coins);
+        getBinding().tvCoins.setText(getString(com.example.habitrpg.R.string.shop_coins_value, state.getData().coins));
         getBinding().tvMessage.setText(state.getData().message);
         getBinding().progressBar.setVisibility(state.getData().loading ? View.VISIBLE : View.GONE);
     }

@@ -17,6 +17,7 @@ import com.example.habitrpg.R;
 import com.example.habitrpg.core.CoreFragment;
 import com.example.habitrpg.core.SimpleTextWatcher;
 import com.example.habitrpg.databinding.FragmentProfileBinding;
+import com.example.habitrpg.feature.equipment.EquipmentManager;
 import com.google.zxing.BarcodeFormat;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
@@ -114,7 +115,7 @@ public class ProfileFragment extends CoreFragment<FragmentProfileBinding> {
         getBinding().tvXp.setText(getString(R.string.profile_xp_value, user.xp));
         getBinding().tvCoins.setText(getString(R.string.profile_coins_value, user.coins));
         getBinding().tvBadges.setText(getString(R.string.profile_badges_value, user.badges.size(), formatList(user.badges)));
-        getBinding().tvEquipment.setText(getString(R.string.profile_equipment_value, formatList(user.equipment)));
+        getBinding().tvEquipment.setText(getString(R.string.profile_equipment_value, formatEquipmentList(user.equipment)));
 
         Bitmap qrBitmap = generateQrCode(user.uid);
         if (qrBitmap != null)
@@ -132,6 +133,43 @@ public class ProfileFragment extends CoreFragment<FragmentProfileBinding> {
             builder.append(values.get(i));
         }
         return builder.toString();
+    }
+
+    private String formatEquipmentList(java.util.List<String> values) {
+        if (values == null || values.isEmpty()) {
+            return "nema";
+        }
+
+        java.util.List<String> readable = new java.util.ArrayList<>();
+        for (String value : values) {
+            if (value == null || value.trim().isEmpty()) continue;
+
+            if (value.startsWith("ONE_SHOT:")) {
+                String itemId = value.substring("ONE_SHOT:".length());
+                readable.add(EquipmentManager.nameOf(itemId) + " (aktivan za sledeću borbu)");
+            } else if (value.startsWith("PERM_ACTIVE:")) {
+                String itemId = value.substring("PERM_ACTIVE:".length());
+                readable.add(EquipmentManager.nameOf(itemId) + " (trajno aktivan)");
+            } else if (value.startsWith("ACTIVE:")) {
+                String[] split = value.split(":");
+                if (split.length == 3) {
+                    readable.add(EquipmentManager.nameOf(split[1]) + " (još " + split[2] + " borbe)");
+                } else {
+                    readable.add(value);
+                }
+            } else if (value.startsWith("WEAPON_STATE:")) {
+                String[] split = value.split(":");
+                if (split.length >= 2) {
+                    readable.add(EquipmentManager.nameOf(split[1]) + " (trajna oprema)");
+                } else {
+                    readable.add(value);
+                }
+            } else {
+                readable.add(EquipmentManager.nameOf(value));
+            }
+        }
+
+        return readable.isEmpty() ? "nema" : formatList(readable);
     }
 
     private Bitmap generateQrCode(String text) {

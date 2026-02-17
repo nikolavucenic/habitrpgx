@@ -1,47 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:background="#101426"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <TextView
+            android:id="@+id/tv_shop_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Prodavnica opreme"
-            android:textSize="22sp"
+            android:text="@string/shop_title"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tv_coins"
+            android:id="@+id/tv_shop_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Novčići: 0" />
+            android:layout_marginTop="6dp"
+            android:text="@string/shop_subtitle"
+            android:textColor="#D4DAF0"
+            android:textSize="13sp" />
 
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_width="wrap_content"
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="12dp"
+            app:cardBackgroundColor="#1D2542"
+            app:cardCornerRadius="20dp"
+            app:strokeColor="#44FFFFFF"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="14dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_shop"
+                    app:tint="#EAC75A" />
+
+                <TextView
+                    android:id="@+id/tv_coins"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:text="@string/shop_coins_value"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:indeterminateTint="#9BD0FF"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/tv_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:textColor="#FFD580"
+            android:textSize="13sp" />
 
-        <Button android:id="@+id/btn_buy_potion20" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Napitak +20% (50 novčića)" />
-        <Button android:id="@+id/btn_buy_potion40" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Napitak +40% (70 novčića)" />
-        <Button android:id="@+id/btn_buy_potion_perm5" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Napitak +5% trajno (200 novčića)" />
-        <Button android:id="@+id/btn_buy_potion_perm10" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Napitak +10% trajno (1000 novčića)" />
-        <Button android:id="@+id/btn_buy_gloves" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Rukavice (60 novčića)" />
-        <Button android:id="@+id/btn_buy_shield" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Štit (60 novčića)" />
-        <Button android:id="@+id/btn_buy_boots" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Čizme (80 novčića)" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/shop_potions_title"
+            android:textColor="#9BD0FF"
+            android:textStyle="bold" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_buy_potion20"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/shop_item_potion20"
+            android:textAllCaps="false"
+            android:textColor="#EAF2FF" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_buy_potion40"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/shop_item_potion40"
+            android:textAllCaps="false"
+            android:textColor="#EAF2FF" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_buy_potion_perm5"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/shop_item_potion_perm5"
+            android:textAllCaps="false"
+            android:textColor="#EAF2FF" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_buy_potion_perm10"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/shop_item_potion_perm10"
+            android:textAllCaps="false"
+            android:textColor="#EAF2FF" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/shop_clothing_title"
+            android:textColor="#EAC75A"
+            android:textStyle="bold" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_buy_gloves"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/shop_item_gloves"
+            android:textAllCaps="false"
+            android:textColor="#FFF6DA" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_buy_shield"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/shop_item_shield"
+            android:textAllCaps="false"
+            android:textColor="#FFF6DA" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_buy_boots"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/shop_item_boots"
+            android:textAllCaps="false"
+            android:textColor="#FFF6DA" />
 
     </LinearLayout>
-</ScrollView>
+
+</androidx.core.widget.NestedScrollView>

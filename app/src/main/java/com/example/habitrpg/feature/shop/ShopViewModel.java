@@ -8,6 +8,7 @@ import com.example.domain.model.User;
 import com.example.domain.usecase.GetCurrentUserProfileUseCase;
 import com.example.domain.usecase.PurchaseEquipmentUseCase;
 import com.example.habitrpg.core.CoreViewModel;
+import com.example.habitrpg.feature.equipment.EquipmentManager;
 
 import javax.inject.Inject;
 
@@ -33,7 +34,7 @@ public class ShopViewModel extends CoreViewModel<ShopUiState, ShopAction, String
             ShopAction.OnBuyClicked buy = (ShopAction.OnBuyClicked) action;
             purchaseEquipmentUseCase.execute(buy.itemId, buy.cost).thenAccept(result -> new Handler(Looper.getMainLooper()).post(() -> {
                 if (result instanceof Result.Error) effect.setValue(((Result.Error<Void>) result).message);
-                else effect.setValue("Kupljeno: " + buy.itemId);
+                else effect.setValue("Kupljeno: " + EquipmentManager.nameOf(buy.itemId));
                 load();
             }));
         }
