@@ -5,5 +5,6 @@ public abstract class BossBattleAction {
     public static final class OnAttackClicked extends BossBattleAction {}
     public static final class OnShakeAttackTriggered extends BossBattleAction {}
     public static final class OnShakeChestTriggered extends BossBattleAction {}
+    public static final class OnContinueClicked extends BossBattleAction {}
     public static final class OnActivateEquipmentClicked extends BossBattleAction {}
 }

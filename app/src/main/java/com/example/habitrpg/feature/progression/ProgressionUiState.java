@@ -11,6 +11,7 @@ public interface ProgressionUiState {
         public final int pp;
         public final int currentXp;
         public final int requiredXp;
+        public final boolean canStartBossEncounter;
         public final String importancePreview;
         public final String difficultyPreview;
 
@@ -21,6 +22,7 @@ public interface ProgressionUiState {
                     int pp,
                     int currentXp,
                     int requiredXp,
+                    boolean canStartBossEncounter,
                     String importancePreview,
                     String difficultyPreview) {
             this.username = username;
@@ -30,6 +32,7 @@ public interface ProgressionUiState {
             this.pp = pp;
             this.currentXp = currentXp;
             this.requiredXp = requiredXp;
+            this.canStartBossEncounter = canStartBossEncounter;
             this.importancePreview = importancePreview;
             this.difficultyPreview = difficultyPreview;
         }
@@ -81,6 +84,6 @@ public interface ProgressionUiState {
     }
 
     static Data initialData() {
-        return new Data("Heroj", "Početnik navika", 1, 1, 0, 0, 200, "", "");
+        return new Data("Heroj", "Početnik navika", 1, 1, 0, 0, 200, false, "", "");
     }
 }

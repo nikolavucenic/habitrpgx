@@ -99,7 +99,8 @@
     <string name="boss_chest_cd">Kovčeg sa nagradama</string>
     <string name="boss_chest_closed_hint">Protresi uređaj ili tapni kovčeg za otvaranje</string>
     <string name="boss_chest_opened_hint">Kovčeg otvoren!</string>
-    <string name="boss_rewards_value">Nagrada: %1$d novčića • Oprema: %2$s</string>
+    <string name="boss_rewards_value">Nagrada: %1$d novčića • %2$d PP • Oprema: %3$s</string>
+    <string name="boss_continue_button">Nazad na progresiju</string>
     <string name="boss_no_equipment">nije dobijena</string>
 
 </resources>

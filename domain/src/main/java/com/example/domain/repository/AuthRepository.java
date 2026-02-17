@@ -13,4 +13,5 @@ public interface AuthRepository {
     CompletableFuture<Result<Void>> changePassword(String oldPassword, String newPassword);
     CompletableFuture<Result<Boolean>> isEmailVerified();
     CompletableFuture<Result<Void>> resendVerificationEmail();
+    CompletableFuture<Result<Void>> applyBossBattleRewards(int earnedCoins, int earnedPp, String earnedEquipment);
 }

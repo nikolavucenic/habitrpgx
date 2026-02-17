@@ -7,6 +7,7 @@ import android.os.Looper;
 import com.example.domain.core.Result;
 import com.example.domain.model.User;
 import com.example.domain.progression.BossBattleCalculator;
+import com.example.domain.usecase.ApplyBossBattleRewardsUseCase;
 import com.example.domain.usecase.GetCurrentUserProfileUseCase;
 import com.example.domain.usecase.GetStageSuccessRateUseCase;
 import com.example.habitrpg.core.CoreViewModel;
@@ -25,17 +26,20 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
 
     private final GetCurrentUserProfileUseCase getCurrentUserProfileUseCase;
     private final GetStageSuccessRateUseCase getStageSuccessRateUseCase;
+    private final ApplyBossBattleRewardsUseCase applyBossBattleRewardsUseCase;
     private final SharedPreferences sharedPreferences;
     private final Random random = new Random();
 
     @Inject
     public BossBattleViewModel(GetCurrentUserProfileUseCase getCurrentUserProfileUseCase,
                                GetStageSuccessRateUseCase getStageSuccessRateUseCase,
+                               ApplyBossBattleRewardsUseCase applyBossBattleRewardsUseCase,
                                SharedPreferences sharedPreferences) {
         this.getCurrentUserProfileUseCase = getCurrentUserProfileUseCase;
         this.getStageSuccessRateUseCase = getStageSuccessRateUseCase;
+        this.applyBossBattleRewardsUseCase = applyBossBattleRewardsUseCase;
         this.sharedPreferences = sharedPreferences;
-        state.setValue(BossBattleUiState.loading());
+        state.setValue(new BossBattleUiState.Loading(BossBattleUiState.initialData()));
     }
 
     @Override
@@ -46,18 +50,21 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
             processAttack();
         } else if (action instanceof BossBattleAction.OnShakeChestTriggered) {
             openChest();
+        } else if (action instanceof BossBattleAction.OnContinueClicked) {
+            continueAfterBattle();
         } else if (action instanceof BossBattleAction.OnActivateEquipmentClicked) {
             sideEffect.setValue(new BossBattleSideEffect.ShowToast("Oprema stiže sa Feature #6."));
         }
     }
 
     private void loadBattle() {
-        state.setValue(BossBattleUiState.loading());
+        BossBattleUiState.Data currentData = getDataOrInitial();
+        state.setValue(new BossBattleUiState.Loading(currentData));
         getCurrentUserProfileUseCase.execute().thenAccept(profileResult ->
                 getStageSuccessRateUseCase.execute().thenAccept(successResult ->
                         new Handler(Looper.getMainLooper()).post(() -> {
                             if (profileResult instanceof Result.Error) {
-                                sideEffect.setValue(new BossBattleSideEffect.ShowToast(((Result.Error<User>) profileResult).message));
+                                state.setValue(new BossBattleUiState.Error(currentData, ((Result.Error<User>) profileResult).message));
                                 return;
                             }
 
@@ -80,8 +87,7 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
 
                             persistBossState(bossNumber, currentHp);
 
-                            state.setValue(new BossBattleUiState(
-                                    false,
+                            state.setValue(new BossBattleUiState.Active(new BossBattleUiState.Data(
                                     bossNumber,
                                     maxHp,
                                     currentHp,
@@ -91,10 +97,12 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
                                     false,
                                     false,
                                     0,
+                                    0,
                                     null,
                                     false,
+                                    false,
                                     "Borba je počela. Napadni bosa!"
-                            ));
+                            )));
                         })
                 )
         );
@@ -102,18 +110,19 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
 
     private void processAttack() {
         BossBattleUiState current = state.getValue();
-        if (current == null || current.loading || current.battleFinished) return;
-        if (current.attacksLeft <= 0) return;
+        BossBattleUiState.Data currentData = current != null ? current.getData() : null;
+        if (currentData == null || current instanceof BossBattleUiState.Loading || currentData.battleFinished) return;
+        if (currentData.attacksLeft <= 0) return;
 
-        int attacksLeft = current.attacksLeft - 1;
+        int attacksLeft = currentData.attacksLeft - 1;
         int roll = random.nextInt(100);
-        boolean hit = roll < current.successChance;
+        boolean hit = roll < currentData.successChance;
 
-        int nextHp = current.bossCurrentHp;
+        int nextHp = currentData.bossCurrentHp;
         String message;
         if (hit) {
-            nextHp = Math.max(0, nextHp - current.userPp);
-            message = "Pogodak! Boss prima " + current.userPp + " štete.";
+            nextHp = Math.max(0, nextHp - currentData.userPp);
+            message = "Pogodak! Boss prima " + currentData.userPp + " štete.";
             sideEffect.setValue(new BossBattleSideEffect.PlayBossHitAnimation());
         } else {
             message = "Promašaj! Boss je izbegao napad.";
@@ -124,68 +133,93 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
         boolean won = finished && nextHp <= 0;
 
         int earnedCoins = 0;
+        int earnedPp = 0;
         String earnedEquipment = null;
         boolean chestOpened = false;
+        boolean rewardsApplied = false;
 
         if (finished) {
-            Reward reward = calculateReward(current.bossNumber, current.bossMaxHp, nextHp, won);
+            Reward reward = calculateReward(currentData.bossNumber, currentData.bossMaxHp, nextHp, won);
             earnedCoins = reward.coins;
+            earnedPp = reward.pp;
             earnedEquipment = reward.equipment;
             message = won ? "Boss je poražen! Protresi telefon da otvoriš kovčeg." : "Borba završena. Protresi telefon za rezultat.";
-            persistAfterBattle(current.bossNumber, won, nextHp);
+            persistAfterBattle(currentData.bossNumber, won, nextHp);
         } else {
-            persistBossState(current.bossNumber, nextHp);
+            persistBossState(currentData.bossNumber, nextHp);
         }
 
-        state.setValue(new BossBattleUiState(
-                false,
-                current.bossNumber,
-                current.bossMaxHp,
+        state.setValue(new BossBattleUiState.Active(new BossBattleUiState.Data(
+                currentData.bossNumber,
+                currentData.bossMaxHp,
                 nextHp,
-                current.userPp,
-                current.successChance,
+                currentData.userPp,
+                currentData.successChance,
                 attacksLeft,
                 finished,
                 won,
                 earnedCoins,
+                earnedPp,
                 earnedEquipment,
                 chestOpened,
+                rewardsApplied,
                 message
-        ));
+        )));
     }
 
     private void openChest() {
-        BossBattleUiState current = state.getValue();
+        BossBattleUiState.Data current = getCurrentData();
         if (current == null || !current.battleFinished || current.chestOpened) return;
         sideEffect.setValue(new BossBattleSideEffect.PlayChestShakeAnimation());
-        state.setValue(new BossBattleUiState(
-                current.loading,
-                current.bossNumber,
-                current.bossMaxHp,
-                current.bossCurrentHp,
-                current.userPp,
-                current.successChance,
-                current.attacksLeft,
-                current.battleFinished,
-                current.battleWon,
-                current.earnedCoins,
-                current.earnedEquipment,
-                true,
-                current.battleWon ? "Kovčeg je otvoren!" : "Utešna nagrada je spremna."
-        ));
+
+        BossBattleUiState.Data opened = copyData(current, true, current.rewardsApplied,
+                current.battleWon ? "Kovčeg je otvoren!" : "Utešna nagrada je spremna.");
+        state.setValue(new BossBattleUiState.Active(opened));
+
+        if (!current.rewardsApplied) {
+            applyRewards(opened);
+        }
+    }
+
+    private void applyRewards(BossBattleUiState.Data currentData) {
+        applyBossBattleRewardsUseCase.execute(currentData.earnedCoins, currentData.earnedPp, currentData.earnedEquipment)
+                .thenAccept(result -> new Handler(Looper.getMainLooper()).post(() -> {
+                    BossBattleUiState.Data latest = getCurrentData();
+                    if (latest == null) return;
+
+                    if (result instanceof Result.Error) {
+                        sideEffect.setValue(new BossBattleSideEffect.ShowToast(((Result.Error<Void>) result).message));
+                        return;
+                    }
+
+                    state.setValue(new BossBattleUiState.Active(copyData(latest, latest.chestOpened, true, latest.battleMessage)));
+                }));
+    }
+
+    private void continueAfterBattle() {
+        BossBattleUiState.Data current = getCurrentData();
+        if (current == null || !current.chestOpened) return;
+        if (!current.rewardsApplied) {
+            sideEffect.setValue(new BossBattleSideEffect.ShowToast("Sačekaj trenutak da se nagrade sačuvaju."));
+            return;
+        }
+        sideEffect.setValue(new BossBattleSideEffect.NavigateBack());
     }
 
     private Reward calculateReward(int bossNumber, int bossMaxHp, int remainingHp, boolean won) {
         int coins = BossBattleCalculator.coinsForBoss(bossNumber);
+        int pp = Math.max(1, Math.round(coins / 4f));
         int chancePercent = 20;
 
         if (!won) {
             int damaged = bossMaxHp - remainingHp;
             if (damaged >= bossMaxHp / 2) {
                 coins = Math.round(coins / 2f);
+                pp = Math.max(1, Math.round(pp / 2f));
                 chancePercent = 10;
             } else {
                 coins = 0;
+                pp = 0;
                 chancePercent = 0;
             }
         }
@@ -195,7 +229,7 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
             equipment = random.nextInt(100) < 95 ? "Odeća" : "Oružje";
         }
 
-        return new Reward(coins, equipment);
+        return new Reward(coins, pp, equipment);
     }
 
     private void persistAfterBattle(int currentBossNumber, boolean won, int remainingHp) {
@@ -214,12 +248,46 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
                 .apply();
     }
 
+    private BossBattleUiState.Data getCurrentData() {
+        BossBattleUiState current = state.getValue();
+        return current != null ? current.getData() : null;
+    }
+
+    private BossBattleUiState.Data getDataOrInitial() {
+        BossBattleUiState.Data data = getCurrentData();
+        return data != null ? data : BossBattleUiState.initialData();
+    }
+
+    private BossBattleUiState.Data copyData(BossBattleUiState.Data current,
+                                            boolean chestOpened,
+                                            boolean rewardsApplied,
+                                            String message) {
+        return new BossBattleUiState.Data(
+                current.bossNumber,
+                current.bossMaxHp,
+                current.bossCurrentHp,
+                current.userPp,
+                current.successChance,
+                current.attacksLeft,
+                current.battleFinished,
+                current.battleWon,
+                current.earnedCoins,
+                current.earnedPp,
+                current.earnedEquipment,
+                chestOpened,
+                rewardsApplied,
+                message
+        );
+    }
+
     private static class Reward {
         final int coins;
+        final int pp;
         final String equipment;
 
-        Reward(int coins, String equipment) {
+        Reward(int coins, int pp, String equipment) {
             this.coins = coins;
+            this.pp = pp;
             this.equipment = equipment;
         }
     }
