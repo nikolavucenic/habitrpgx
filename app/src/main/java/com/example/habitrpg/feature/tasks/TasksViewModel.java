@@ -176,11 +176,7 @@ public class TasksViewModel extends CoreViewModel<TasksUiState, TasksAction, Tas
 
     private List<TaskItem> filterTasks(List<TaskItem> source, int filter) {
         List<TaskItem> filtered = new ArrayList<>();
-        long now = System.currentTimeMillis();
         for (TaskItem task : source) {
-            if (task.getExecuteAt() < now && task.getStatus().equals(TaskItem.STATUS_ACTIVE)) {
-                continue;
-            }
             if (filter == TasksUiState.FILTER_ALL) {
                 filtered.add(task);
             } else if (filter == TasksUiState.FILTER_ONE_TIME && TaskItem.TYPE_ONE_TIME.equals(task.getType())) {

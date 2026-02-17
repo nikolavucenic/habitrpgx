@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 
 import com.example.domain.core.Result;
 import com.example.domain.model.User;
+import com.example.domain.progression.ProgressionCalculator;
 import com.example.domain.repository.AuthRepository;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
@@ -59,7 +60,7 @@ public class AuthRepositoryImpl implements AuthRepository {
             profile.put("avatarId", avatarId);
             profile.put("level", 1);
             profile.put("title", "Početnik navika");
-            profile.put("pp", 0);
+            profile.put("pp", 40);
             profile.put("xp", 0);
             profile.put("coins", 0);
             profile.put("badges", new ArrayList<String>());
@@ -118,7 +119,7 @@ public class AuthRepositoryImpl implements AuthRepository {
                             future.complete(new Result.Error<>("Podaci o korisniku nisu dostupni."));
                             return;
                         }
-                        User user = mapToUser(doc);
+                        User user = normalizeAndPersistProgressIfNeeded(fbUser.getUid(), mapToUser(doc));
                         sharedPreferences.edit().putBoolean(KEY_IS_LOGGED_IN, true).apply();
                         future.complete(new Result.Success<>(user));
                     } else {
@@ -157,7 +158,8 @@ public class AuthRepositoryImpl implements AuthRepository {
                         future.complete(new Result.Error<>("Profil nije pronađen."));
                         return;
                     }
-                    future.complete(new Result.Success<>(mapToUser(doc)));
+                    User user = normalizeAndPersistProgressIfNeeded(current.getUid(), mapToUser(doc));
+                    future.complete(new Result.Success<>(user));
                 })
                 .addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
 
@@ -211,6 +213,40 @@ public class AuthRepositoryImpl implements AuthRepository {
         return future;
     }
 
+
+    private User normalizeAndPersistProgressIfNeeded(String uid, User user) {
+        int level = Math.max(1, user.level);
+        int xp = Math.max(0, user.xp);
+        int pp = Math.max(0, user.pp);
+
+        boolean changed = false;
+
+        while (xp >= ProgressionCalculator.requiredXpForLevel(level)) {
+            xp -= ProgressionCalculator.requiredXpForLevel(level);
+            pp += ProgressionCalculator.ppRewardForLevel(level);
+            level++;
+            changed = true;
+        }
+
+        if (level == 1 && pp < 40) {
+            pp = 40;
+            changed = true;
+        }
+
+        if (!changed) {
+            return user;
+        }
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("level", level);
+        updates.put("xp", xp);
+        updates.put("pp", pp);
+        updates.put("title", ProgressionCalculator.titleForLevel(level));
+        mDb.collection("users").document(uid).update(updates);
+        return new User(user.uid, user.email, user.username, user.avatarId, level,
+                ProgressionCalculator.titleForLevel(level), pp, xp, user.coins, user.badges, user.equipment);
+    }
+
     @SuppressWarnings("unchecked")
     private User mapToUser(Map<String, Object> doc) {
         String uid = (String) doc.getOrDefault("uid", "");
@@ -219,7 +255,7 @@ public class AuthRepositoryImpl implements AuthRepository {
         int avatarId = ((Number) doc.getOrDefault("avatarId", 1)).intValue();
         int level = ((Number) doc.getOrDefault("level", 1)).intValue();
         String title = (String) doc.getOrDefault("title", "Početnik navika");
-        int pp = ((Number) doc.getOrDefault("pp", 0)).intValue();
+        int pp = ((Number) doc.getOrDefault("pp", 40)).intValue();
         int xp = ((Number) doc.getOrDefault("xp", 0)).intValue();
         int coins = ((Number) doc.getOrDefault("coins", 0)).intValue();
         List<String> badges = (List<String>) doc.getOrDefault("badges", new ArrayList<String>());
