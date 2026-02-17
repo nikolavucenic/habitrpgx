@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.habitrpg.R;
 import com.example.habitrpg.core.CoreFragment;
@@ -30,6 +31,8 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
         super.onViewCreated(view, savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(ProgressionViewModel.class);
+        getBinding().btnStartBossBattle.setOnClickListener(v -> NavHostFragment.findNavController(this)
+                .navigate(R.id.action_progression_to_boss_battle));
         viewModel.getState().observe(getViewLifecycleOwner(), state -> {
             ProgressionUiState.Data data = state.getData();
 

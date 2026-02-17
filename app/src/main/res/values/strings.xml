@@ -84,4 +84,22 @@
     <string name="cancel">Otkaži</string>
     <string name="save">Sačuvaj</string>
 
+    <string name="progression_start_boss_battle">Uđi u Boss Encounter</string>
+
+    <string name="boss_screen_title">Boss Encounter</string>
+    <string name="boss_name_value">Boss #%1$d</string>
+    <string name="boss_illustration">Ilustrovani boss</string>
+    <string name="boss_hp_value">HP bosa: %1$d / %2$d</string>
+    <string name="boss_pp_value">PP korisnika: %1$d</string>
+    <string name="boss_chance_value">Šansa pogotka: %1$d%%</string>
+    <string name="boss_attempts_value">Preostali napadi: %1$d od 5</string>
+    <string name="boss_equipment_placeholder">Aktivna oprema: trenutno nema aktivacije (Feature #6)</string>
+    <string name="boss_equipment_button">Oprema</string>
+    <string name="boss_attack_button">Napadni</string>
+    <string name="boss_chest_cd">Kovčeg sa nagradama</string>
+    <string name="boss_chest_closed_hint">Protresi uređaj ili tapni kovčeg za otvaranje</string>
+    <string name="boss_chest_opened_hint">Kovčeg otvoren!</string>
+    <string name="boss_rewards_value">Nagrada: %1$d novčića • Oprema: %2$s</string>
+    <string name="boss_no_equipment">nije dobijena</string>
+
 </resources>
