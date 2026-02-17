@@ -1,5 +1,8 @@
 package com.example.habitrpg.feature.bossbattle;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public interface BossBattleUiState {
 
     Data getData();
@@ -19,6 +22,8 @@ public interface BossBattleUiState {
         public final boolean chestOpened;
         public final boolean rewardsApplied;
         public final String battleMessage;
+        public final List<String> equipmentTokens;
+        public final String activeEquipmentSummary;
 
         public Data(int bossNumber,
                     int encounterLevel,
@@ -33,7 +38,9 @@ public interface BossBattleUiState {
                     String earnedEquipment,
                     boolean chestOpened,
                     boolean rewardsApplied,
-                    String battleMessage) {
+                    String battleMessage,
+                    List<String> equipmentTokens,
+                    String activeEquipmentSummary) {
             this.bossNumber = bossNumber;
             this.encounterLevel = encounterLevel;
             this.bossMaxHp = bossMaxHp;
@@ -48,57 +55,34 @@ public interface BossBattleUiState {
             this.chestOpened = chestOpened;
             this.rewardsApplied = rewardsApplied;
             this.battleMessage = battleMessage;
+            this.equipmentTokens = equipmentTokens;
+            this.activeEquipmentSummary = activeEquipmentSummary;
         }
     }
 
     class Loading implements BossBattleUiState {
         private final Data data;
-
-        public Loading(Data data) {
-            this.data = data;
-        }
-
-        @Override
-        public Data getData() {
-            return data;
-        }
+        public Loading(Data data) { this.data = data; }
+        @Override public Data getData() { return data; }
     }
 
     class Active implements BossBattleUiState {
         private final Data data;
-
-        public Active(Data data) {
-            this.data = data;
-        }
-
-        @Override
-        public Data getData() {
-            return data;
-        }
+        public Active(Data data) { this.data = data; }
+        @Override public Data getData() { return data; }
     }
 
     class Error implements BossBattleUiState {
         private final Data data;
         private final String message;
-
-        public Error(Data data, String message) {
-            this.data = data;
-            this.message = message;
-        }
-
-        @Override
-        public Data getData() {
-            return data;
-        }
-
-        public String getMessage() {
-            return message;
-        }
+        public Error(Data data, String message) { this.data = data; this.message = message; }
+        @Override public Data getData() { return data; }
+        public String getMessage() { return message; }
     }
 
     static Data initialData() {
         return new Data(1, 1, 200, 200, 0, 0, 5,
                 false, false, 0, null, false,
-                false, "");
+                false, "", new ArrayList<>(), "Aktivna oprema: nema");
     }
 }

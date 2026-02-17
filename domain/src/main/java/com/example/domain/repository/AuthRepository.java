@@ -3,6 +3,7 @@ package com.example.domain.repository;
 import com.example.domain.core.Result;
 import com.example.domain.model.User;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface AuthRepository {
@@ -15,4 +16,6 @@ public interface AuthRepository {
     CompletableFuture<Result<Boolean>> isEmailVerified();
     CompletableFuture<Result<Void>> resendVerificationEmail();
     CompletableFuture<Result<Void>> applyBossBattleRewards(int earnedCoins, String earnedEquipment);
+    CompletableFuture<Result<Void>> purchaseEquipment(String equipmentId, int cost);
+    CompletableFuture<Result<Void>> saveEquipmentState(List<String> equipment, int coins);
 }

@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.view.animation.CycleInterpolator;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
@@ -21,6 +23,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.habitrpg.R;
 import com.example.habitrpg.core.CoreFragment;
 import com.example.habitrpg.databinding.FragmentBossBattleBinding;
+import com.example.habitrpg.feature.equipment.EquipmentManager;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -82,7 +85,7 @@ public class BossBattleFragment extends CoreFragment<FragmentBossBattleBinding> 
         getBinding().tvUserPp.setText(getString(R.string.boss_pp_value, data.userPp));
         getBinding().tvChance.setText(getString(R.string.boss_chance_value, data.successChance));
         getBinding().tvAttempts.setText(getString(R.string.boss_attempts_value, data.attacksLeft));
-        getBinding().tvEquipmentStatus.setText(R.string.boss_equipment_placeholder);
+        getBinding().tvEquipmentStatus.setText(data.activeEquipmentSummary);
         getBinding().tvBattleLog.setText(data.battleMessage);
 
         getBinding().progressBossHp.setMax(Math.max(1, data.bossMaxHp));
@@ -103,7 +106,7 @@ public class BossBattleFragment extends CoreFragment<FragmentBossBattleBinding> 
             getBinding().tvRewards.setText(getString(
                     R.string.boss_rewards_value,
                     data.earnedCoins,
-                    data.earnedEquipment == null ? getString(R.string.boss_no_equipment) : data.earnedEquipment
+                    data.earnedEquipment == null ? getString(R.string.boss_no_equipment) : EquipmentManager.nameOf(data.earnedEquipment)
             ));
         } else {
             getBinding().tvRewards.setText("");
@@ -113,6 +116,14 @@ public class BossBattleFragment extends CoreFragment<FragmentBossBattleBinding> 
     private void handleEffect(BossBattleSideEffect effect) {
         if (effect instanceof BossBattleSideEffect.ShowToast) {
             Toast.makeText(getContext(), ((BossBattleSideEffect.ShowToast) effect).message, Toast.LENGTH_SHORT).show();
+        } else if (effect instanceof BossBattleSideEffect.ShowEquipmentPicker) {
+            BossBattleSideEffect.ShowEquipmentPicker picker = (BossBattleSideEffect.ShowEquipmentPicker) effect;
+            String[] labels = picker.labels.toArray(new String[0]);
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Aktiviraj opremu")
+                    .setItems(labels, (dialog, which) -> viewModel.handleAction(new BossBattleAction.OnEquipmentSelected(picker.equipmentIds.get(which))))
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
         } else if (effect instanceof BossBattleSideEffect.PlayBossHitAnimation) {
             getBinding().ivBoss.setImageResource(R.drawable.ic_boss_hit);
             ObjectAnimator hitAnimator = ObjectAnimator.ofFloat(getBinding().ivBoss,

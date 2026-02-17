@@ -1,13 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/shop"
-        android:textStyle="bold"
-        android:textSize="22sp" />
-</FrameLayout>
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Prodavnica opreme"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_coins"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Novčići: 0" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/tv_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+
+        <Button android:id="@+id/btn_buy_potion20" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Napitak +20% (50 novčića)" />
+        <Button android:id="@+id/btn_buy_potion40" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Napitak +40% (70 novčića)" />
+        <Button android:id="@+id/btn_buy_potion_perm5" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Napitak +5% trajno (200 novčića)" />
+        <Button android:id="@+id/btn_buy_potion_perm10" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Napitak +10% trajno (1000 novčića)" />
+        <Button android:id="@+id/btn_buy_gloves" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Rukavice (60 novčića)" />
+        <Button android:id="@+id/btn_buy_shield" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Štit (60 novčića)" />
+        <Button android:id="@+id/btn_buy_boots" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Čizme (80 novčića)" />
+
+    </LinearLayout>
+</ScrollView>
