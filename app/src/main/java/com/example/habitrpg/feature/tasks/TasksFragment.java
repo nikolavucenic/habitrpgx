@@ -42,6 +42,7 @@ public class TasksFragment extends CoreFragment<FragmentTasksBinding> {
         setupList();
         setupObservers();
         setupListeners();
+        setupSwipeToRefresh();
     }
 
     @Override
@@ -110,6 +111,11 @@ public class TasksFragment extends CoreFragment<FragmentTasksBinding> {
                 Navigation.findNavController(requireView()).navigate(R.id.action_tasks_to_create_task));
     }
 
+    private void setupSwipeToRefresh() {
+        getBinding().swipeRefreshTasks.setOnRefreshListener(() ->
+                viewModel.handleAction(new TasksAction.Load()));
+    }
+
     private void confirmDelete(String taskId) {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Brisanje zadatka")
@@ -121,7 +127,9 @@ public class TasksFragment extends CoreFragment<FragmentTasksBinding> {
 
     private void setupObservers() {
         viewModel.getState().observe(getViewLifecycleOwner(), state -> {
-            getBinding().progressBar.setVisibility(state instanceof TasksUiState.Loading ? View.VISIBLE : View.GONE);
+            boolean isLoading = state instanceof TasksUiState.Loading;
+            getBinding().progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            getBinding().swipeRefreshTasks.setRefreshing(isLoading);
             taskAdapter.submit(state.getFilteredTasks());
             getBinding().tvEmptyTasks.setVisibility(state.getFilteredTasks().isEmpty() ? View.VISIBLE : View.GONE);
 
