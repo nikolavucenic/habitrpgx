@@ -6,6 +6,7 @@ import com.example.domain.model.User;
 import java.util.concurrent.CompletableFuture;
 
 public interface AuthRepository {
+    boolean isLoggedIn();
     CompletableFuture<Result<Void>> register(String email, String password, String username, int avatarId);
     CompletableFuture<Result<User>> login(String email, String password);
     CompletableFuture<Result<Void>> logout();

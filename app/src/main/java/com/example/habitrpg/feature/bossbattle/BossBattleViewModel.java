@@ -1,6 +1,5 @@
 package com.example.habitrpg.feature.bossbattle;
 
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -8,8 +7,13 @@ import com.example.domain.core.Result;
 import com.example.domain.model.User;
 import com.example.domain.progression.BossBattleCalculator;
 import com.example.domain.usecase.ApplyBossBattleRewardsUseCase;
+import com.example.domain.usecase.GetBossHpUseCase;
+import com.example.domain.usecase.GetBossNumberUseCase;
+import com.example.domain.usecase.GetLastResolvedBossEncounterLevelUseCase;
 import com.example.domain.usecase.GetCurrentUserProfileUseCase;
 import com.example.domain.usecase.GetStageSuccessRateUseCase;
+import com.example.domain.usecase.SaveBossStateUseCase;
+import com.example.domain.usecase.SaveLastResolvedBossEncounterLevelUseCase;
 import com.example.habitrpg.core.CoreViewModel;
 
 import java.util.Random;
@@ -21,25 +25,33 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 @HiltViewModel
 public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBattleAction, BossBattleSideEffect> {
 
-    private static final String KEY_BOSS_NUMBER = "boss_number";
-    private static final String KEY_BOSS_HP = "boss_hp";
-    private static final String KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL = "last_resolved_boss_encounter_level";
-
     private final GetCurrentUserProfileUseCase getCurrentUserProfileUseCase;
     private final GetStageSuccessRateUseCase getStageSuccessRateUseCase;
     private final ApplyBossBattleRewardsUseCase applyBossBattleRewardsUseCase;
-    private final SharedPreferences sharedPreferences;
+    private final GetBossNumberUseCase getBossNumberUseCase;
+    private final GetBossHpUseCase getBossHpUseCase;
+    private final SaveBossStateUseCase saveBossStateUseCase;
+    private final GetLastResolvedBossEncounterLevelUseCase getLastResolvedBossEncounterLevelUseCase;
+    private final SaveLastResolvedBossEncounterLevelUseCase saveLastResolvedBossEncounterLevelUseCase;
     private final Random random = new Random();
 
     @Inject
     public BossBattleViewModel(GetCurrentUserProfileUseCase getCurrentUserProfileUseCase,
                                GetStageSuccessRateUseCase getStageSuccessRateUseCase,
                                ApplyBossBattleRewardsUseCase applyBossBattleRewardsUseCase,
-                               SharedPreferences sharedPreferences) {
+                               GetBossNumberUseCase getBossNumberUseCase,
+                               GetBossHpUseCase getBossHpUseCase,
+                               SaveBossStateUseCase saveBossStateUseCase,
+                               GetLastResolvedBossEncounterLevelUseCase getLastResolvedBossEncounterLevelUseCase,
+                               SaveLastResolvedBossEncounterLevelUseCase saveLastResolvedBossEncounterLevelUseCase) {
         this.getCurrentUserProfileUseCase = getCurrentUserProfileUseCase;
         this.getStageSuccessRateUseCase = getStageSuccessRateUseCase;
         this.applyBossBattleRewardsUseCase = applyBossBattleRewardsUseCase;
-        this.sharedPreferences = sharedPreferences;
+        this.getBossNumberUseCase = getBossNumberUseCase;
+        this.getBossHpUseCase = getBossHpUseCase;
+        this.saveBossStateUseCase = saveBossStateUseCase;
+        this.getLastResolvedBossEncounterLevelUseCase = getLastResolvedBossEncounterLevelUseCase;
+        this.saveLastResolvedBossEncounterLevelUseCase = saveLastResolvedBossEncounterLevelUseCase;
         state.setValue(new BossBattleUiState.Loading(BossBattleUiState.initialData()));
     }
 
@@ -76,13 +88,14 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
                             }
 
                             int targetBossNumber = Math.max(1, user.level - 1);
-                            int savedBossNumber = sharedPreferences.getInt(KEY_BOSS_NUMBER, 0);
+                            int savedBossNumber = getBossNumberUseCase.execute();
                             int bossNumber = savedBossNumber > 0 && savedBossNumber <= targetBossNumber
                                     ? savedBossNumber
                                     : targetBossNumber;
 
                             int maxHp = BossBattleCalculator.hpForBoss(bossNumber);
-                            int savedHp = sharedPreferences.getInt(KEY_BOSS_HP, maxHp);
+                            int savedHp = getBossHpUseCase.execute();
+                            if (savedHp <= 0) savedHp = maxHp;
                             int currentHp = bossNumber == savedBossNumber ? Math.min(savedHp, maxHp) : maxHp;
                             if (currentHp <= 0) currentHp = maxHp;
 
@@ -239,20 +252,15 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
     }
 
     private void persistBossState(int bossNumber, int hp) {
-        sharedPreferences.edit()
-                .putInt(KEY_BOSS_NUMBER, bossNumber)
-                .putInt(KEY_BOSS_HP, hp)
-                .apply();
+        saveBossStateUseCase.execute(bossNumber, hp);
     }
 
     private void persistResolvedEncounterLevel(int encounterLevel) {
         int safeLevel = Math.max(1, encounterLevel);
-        int currentLockedLevel = sharedPreferences.getInt(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL, 0);
+        int currentLockedLevel = getLastResolvedBossEncounterLevelUseCase.execute();
         if (safeLevel <= currentLockedLevel) return;
 
-        sharedPreferences.edit()
-                .putInt(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL, safeLevel)
-                .apply();
+        saveLastResolvedBossEncounterLevelUseCase.execute(safeLevel);
     }
 
     private BossBattleUiState.Data getCurrentData() {

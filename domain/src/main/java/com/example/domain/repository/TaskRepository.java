@@ -8,6 +8,14 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface TaskRepository {
+    boolean isPendingBossEncounter();
+    void setPendingBossEncounter(boolean pending);
+    int getLastResolvedBossEncounterLevel();
+    void saveLastResolvedBossEncounterLevel(int encounterLevel);
+    int getBossNumber();
+    int getBossHp();
+    void saveBossState(int bossNumber, int hp);
+
     CompletableFuture<Result<List<TaskCategory>>> getCategories();
     CompletableFuture<Result<Void>> createCategory(String name, String colorHex);
     CompletableFuture<Result<Void>> updateCategory(String categoryId, String name, String colorHex);

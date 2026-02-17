@@ -1,6 +1,5 @@
 package com.example.habitrpg.feature.progression;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +11,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.habitrpg.R;
+import com.example.domain.usecase.GetLastResolvedBossEncounterLevelUseCase;
+import com.example.domain.usecase.IsPendingBossEncounterUseCase;
+import com.example.domain.usecase.SetPendingBossEncounterUseCase;
 import com.example.habitrpg.core.CoreFragment;
 import com.example.habitrpg.databinding.FragmentProgressionBinding;
 
@@ -22,11 +24,14 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding> {
 
-    private static final String KEY_PENDING_BOSS_ENCOUNTER = "pending_boss_encounter";
-    private static final String KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL = "last_resolved_boss_encounter_level";
+    @Inject
+    IsPendingBossEncounterUseCase isPendingBossEncounterUseCase;
 
     @Inject
-    SharedPreferences sharedPreferences;
+    SetPendingBossEncounterUseCase setPendingBossEncounterUseCase;
+
+    @Inject
+    GetLastResolvedBossEncounterLevelUseCase getLastResolvedBossEncounterLevelUseCase;
 
     private ProgressionViewModel viewModel;
     private boolean autoNavigationHandled;
@@ -58,7 +63,7 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
             getBinding().tvXpNeeded.setText(getString(R.string.progression_xp_needed_value, remaining));
             getBinding().tvImportanceValues.setText(data.importancePreview);
             getBinding().tvDifficultyValues.setText(data.difficultyPreview);
-            int lockedBossEncounterLevel = sharedPreferences.getInt(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL, 0);
+            int lockedBossEncounterLevel = getLastResolvedBossEncounterLevelUseCase.execute();
             boolean canStartBossEncounter = data.canStartBossEncounter && data.level > lockedBossEncounterLevel;
             getBinding().btnStartBossBattle.setVisibility(canStartBossEncounter ? View.VISIBLE : View.GONE);
 
@@ -79,14 +84,14 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
         if (autoNavigationHandled) return;
         if (!(state instanceof ProgressionUiState.Success)) return;
 
-        boolean pendingBoss = sharedPreferences.getBoolean(KEY_PENDING_BOSS_ENCOUNTER, false);
+        boolean pendingBoss = isPendingBossEncounterUseCase.execute();
         if (!pendingBoss) return;
-        int lockedBossEncounterLevel = sharedPreferences.getInt(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL, 0);
+        int lockedBossEncounterLevel = getLastResolvedBossEncounterLevelUseCase.execute();
         boolean canStartBossEncounter = state.getData().canStartBossEncounter && state.getData().level > lockedBossEncounterLevel;
         if (!canStartBossEncounter) return;
 
         autoNavigationHandled = true;
-        sharedPreferences.edit().putBoolean(KEY_PENDING_BOSS_ENCOUNTER, false).apply();
+        setPendingBossEncounterUseCase.execute(false);
         NavHostFragment.findNavController(this).navigate(R.id.action_progression_to_boss_battle);
     }
 

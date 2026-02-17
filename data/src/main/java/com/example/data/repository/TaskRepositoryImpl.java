@@ -26,6 +26,9 @@ import javax.inject.Singleton;
 public class TaskRepositoryImpl implements TaskRepository {
 
     private static final String KEY_PENDING_BOSS_ENCOUNTER = "pending_boss_encounter";
+    private static final String KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL = "last_resolved_boss_encounter_level";
+    private static final String KEY_BOSS_NUMBER = "boss_number";
+    private static final String KEY_BOSS_HP = "boss_hp";
 
     private final FirebaseAuth auth;
     private final FirebaseFirestore db;
@@ -36,6 +39,44 @@ public class TaskRepositoryImpl implements TaskRepository {
         this.auth = FirebaseAuth.getInstance();
         this.db = db;
         this.sharedPreferences = sharedPreferences;
+    }
+
+    @Override
+    public boolean isPendingBossEncounter() {
+        return sharedPreferences.getBoolean(KEY_PENDING_BOSS_ENCOUNTER, false);
+    }
+
+    @Override
+    public void setPendingBossEncounter(boolean pending) {
+        sharedPreferences.edit().putBoolean(KEY_PENDING_BOSS_ENCOUNTER, pending).apply();
+    }
+
+    @Override
+    public int getLastResolvedBossEncounterLevel() {
+        return sharedPreferences.getInt(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL, 0);
+    }
+
+    @Override
+    public void saveLastResolvedBossEncounterLevel(int encounterLevel) {
+        sharedPreferences.edit().putInt(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL, encounterLevel).apply();
+    }
+
+    @Override
+    public int getBossNumber() {
+        return sharedPreferences.getInt(KEY_BOSS_NUMBER, 0);
+    }
+
+    @Override
+    public int getBossHp() {
+        return sharedPreferences.getInt(KEY_BOSS_HP, 0);
+    }
+
+    @Override
+    public void saveBossState(int bossNumber, int hp) {
+        sharedPreferences.edit()
+                .putInt(KEY_BOSS_NUMBER, bossNumber)
+                .putInt(KEY_BOSS_HP, hp)
+                .apply();
     }
 
     @Override
@@ -282,7 +323,7 @@ public class TaskRepositoryImpl implements TaskRepository {
             userRef.update(updates)
                     .addOnSuccessListener(unused -> {
                         if (finalLeveledUp) {
-                            sharedPreferences.edit().putBoolean(KEY_PENDING_BOSS_ENCOUNTER, true).apply();
+                            setPendingBossEncounter(true);
                         }
                         future.complete(new Result.Success<>(null));
                     })
