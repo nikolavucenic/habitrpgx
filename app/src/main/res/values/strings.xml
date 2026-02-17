@@ -118,4 +118,53 @@
     <string name="boss_continue_button">Nazad na progresiju</string>
     <string name="boss_no_equipment">nije dobijena</string>
 
+
+    <string name="social_screen_title">Savez</string>
+    <string name="social_screen_subtitle">Prijatelji, pozivnice, misija i chat na jednom mestu</string>
+    <string name="social_search_section_title">Pronađi prijatelje</string>
+    <string name="social_search_hint">Username ili UID</string>
+    <string name="social_search_button">Pretraži</string>
+    <string name="social_refresh_button">Osveži</string>
+    <string name="social_search_empty">Nema rezultata pretrage.</string>
+    <string name="social_search_result_value">%1$s (%2$s)</string>
+    <string name="social_add_button">Dodaj</string>
+
+    <string name="social_friends_section_title">Moji prijatelji</string>
+    <string name="social_friends_empty">Nema prijatelja.</string>
+    <string name="social_friend_avatar_value">avatar #%1$d</string>
+
+    <string name="social_create_section_title">Kreiranje saveza</string>
+    <string name="social_alliance_name_hint">Naziv saveza</string>
+    <string name="social_create_subtitle">Poziv će biti poslat svim prijateljima</string>
+    <string name="social_create_button">Kreiraj savez</string>
+
+    <string name="social_invites_section_title">Pozivnice</string>
+    <string name="social_invites_empty">Nema aktivnih pozivnica.</string>
+    <string name="social_invite_from_value">Pozvao: %1$s</string>
+    <string name="social_accept_button">Prihvati</string>
+    <string name="social_decline_button">Odbij</string>
+
+    <string name="social_alliance_none_title">Niste član saveza</string>
+    <string name="social_alliance_none_subtitle">Prihvatite pozivnicu ili kreirajte novi savez.</string>
+    <string name="social_alliance_title_value">Savez: %1$s</string>
+    <string name="social_alliance_leader_value">Vođa: %1$s</string>
+    <string name="social_alliance_members_value">Članovi: %1$d</string>
+    <string name="social_alliance_mission_active">Misija aktivna</string>
+    <string name="social_alliance_mission_inactive">Misija nije pokrenuta</string>
+    <string name="social_start_mission_button">Pokreni specijalnu misiju</string>
+    <string name="social_boss_hp_value">Boss HP: %1$d / %2$d</string>
+
+    <string name="social_chat_section_title">Chat saveza</string>
+    <string name="social_messages_empty">Nema poruka.</string>
+    <string name="social_message_hint">Napiši poruku</string>
+    <string name="social_send_button">Pošalji</string>
+    <string name="social_message_meta_value">%1$s • %2$s</string>
+
+    <string name="social_toast_alliance_name_required">Unesite naziv saveza</string>
+    <string name="social_toast_friend_added">Prijatelj dodat.</string>
+    <string name="social_toast_alliance_created">Savez kreiran i pozivi poslati.</string>
+    <string name="social_toast_invite_accepted">Poziv prihvaćen.</string>
+    <string name="social_toast_invite_declined">Poziv odbijen.</string>
+    <string name="social_toast_mission_started">Specijalna misija je pokrenuta.</string>
+
 </resources>
