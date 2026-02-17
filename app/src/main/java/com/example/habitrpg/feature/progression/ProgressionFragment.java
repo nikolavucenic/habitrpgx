@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.domain.usecase.SetPendingBossEncounterUseCase;
 import com.example.habitrpg.R;
 import com.example.domain.usecase.GetLastResolvedBossEncounterLevelUseCase;
 import com.example.domain.usecase.IsPendingBossEncounterUseCase;
@@ -26,10 +27,11 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
     @Inject
     IsPendingBossEncounterUseCase isPendingBossEncounterUseCase;
 
-
-
     @Inject
     GetLastResolvedBossEncounterLevelUseCase getLastResolvedBossEncounterLevelUseCase;
+
+    @Inject
+    SetPendingBossEncounterUseCase setPendingBossEncounterUseCase;
 
     private ProgressionViewModel viewModel;
     private boolean autoNavigationHandled;
