@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -221,21 +222,26 @@ public class CreateTaskFragment extends CoreFragment<FragmentCreateTaskBinding> 
         etName.setHint("Naziv kategorije");
         container.addView(etName);
 
-        AutoCompleteTextView actColor = new AutoCompleteTextView(requireContext());
+        Spinner spinnerColor = new Spinner(requireContext());
         List<String> colorNames = new ArrayList<>(categoryColorMap.keySet());
-        actColor.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, colorNames));
-        actColor.setHint("Odaberi boju");
+        ArrayAdapter<String> colorAdapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                colorNames
+        );
+        colorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerColor.setAdapter(colorAdapter);
         if (!colorNames.isEmpty()) {
-            actColor.setText(colorNames.get(0), false);
+            spinnerColor.setSelection(0);
         }
-        container.addView(actColor);
+        container.addView(spinnerColor);
 
         new AlertDialog.Builder(requireContext())
                 .setTitle("Nova kategorija")
                 .setView(container)
                 .setPositiveButton("Sačuvaj", (dialog, which) -> {
                     String name = textValue(etName.getText());
-                    String colorName = textValue(actColor.getText());
+                    String colorName = String.valueOf(spinnerColor.getSelectedItem());
                     String colorHex = getMappedOrDefault(categoryColorMap, colorName, "#5B5CE2");
                     viewModel.handleAction(new TasksAction.CreateCategory(name, colorHex));
                 })
