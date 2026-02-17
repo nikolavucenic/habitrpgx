@@ -6,6 +6,7 @@ public interface BossBattleUiState {
 
     class Data {
         public final int bossNumber;
+        public final int encounterLevel;
         public final int bossMaxHp;
         public final int bossCurrentHp;
         public final int userPp;
@@ -14,13 +15,13 @@ public interface BossBattleUiState {
         public final boolean battleFinished;
         public final boolean battleWon;
         public final int earnedCoins;
-        public final int earnedPp;
         public final String earnedEquipment;
         public final boolean chestOpened;
         public final boolean rewardsApplied;
         public final String battleMessage;
 
         public Data(int bossNumber,
+                    int encounterLevel,
                     int bossMaxHp,
                     int bossCurrentHp,
                     int userPp,
@@ -29,12 +30,12 @@ public interface BossBattleUiState {
                     boolean battleFinished,
                     boolean battleWon,
                     int earnedCoins,
-                    int earnedPp,
                     String earnedEquipment,
                     boolean chestOpened,
                     boolean rewardsApplied,
                     String battleMessage) {
             this.bossNumber = bossNumber;
+            this.encounterLevel = encounterLevel;
             this.bossMaxHp = bossMaxHp;
             this.bossCurrentHp = bossCurrentHp;
             this.userPp = userPp;
@@ -43,7 +44,6 @@ public interface BossBattleUiState {
             this.battleFinished = battleFinished;
             this.battleWon = battleWon;
             this.earnedCoins = earnedCoins;
-            this.earnedPp = earnedPp;
             this.earnedEquipment = earnedEquipment;
             this.chestOpened = chestOpened;
             this.rewardsApplied = rewardsApplied;
@@ -97,8 +97,8 @@ public interface BossBattleUiState {
     }
 
     static Data initialData() {
-        return new Data(1, 200, 200, 0, 0, 5,
-                false, false, 0, 0, null, false,
+        return new Data(1, 1, 200, 200, 0, 0, 5,
+                false, false, 0, null, false,
                 false, "");
     }
 }

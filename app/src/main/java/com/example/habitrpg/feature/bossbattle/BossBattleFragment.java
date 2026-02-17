@@ -103,7 +103,6 @@ public class BossBattleFragment extends CoreFragment<FragmentBossBattleBinding> 
             getBinding().tvRewards.setText(getString(
                     R.string.boss_rewards_value,
                     data.earnedCoins,
-                    data.earnedPp,
                     data.earnedEquipment == null ? getString(R.string.boss_no_equipment) : data.earnedEquipment
             ));
         } else {

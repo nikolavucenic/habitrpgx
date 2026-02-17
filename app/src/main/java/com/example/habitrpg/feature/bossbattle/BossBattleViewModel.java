@@ -23,6 +23,7 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
 
     private static final String KEY_BOSS_NUMBER = "boss_number";
     private static final String KEY_BOSS_HP = "boss_hp";
+    private static final String KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL = "last_resolved_boss_encounter_level";
 
     private final GetCurrentUserProfileUseCase getCurrentUserProfileUseCase;
     private final GetStageSuccessRateUseCase getStageSuccessRateUseCase;
@@ -89,6 +90,7 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
 
                             state.setValue(new BossBattleUiState.Active(new BossBattleUiState.Data(
                                     bossNumber,
+                                    user.level,
                                     maxHp,
                                     currentHp,
                                     Math.max(0, user.pp),
@@ -96,7 +98,6 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
                                     5,
                                     false,
                                     false,
-                                    0,
                                     0,
                                     null,
                                     false,
@@ -133,7 +134,6 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
         boolean won = finished && nextHp <= 0;
 
         int earnedCoins = 0;
-        int earnedPp = 0;
         String earnedEquipment = null;
         boolean chestOpened = false;
         boolean rewardsApplied = false;
@@ -141,16 +141,17 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
         if (finished) {
             Reward reward = calculateReward(currentData.bossNumber, currentData.bossMaxHp, nextHp, won);
             earnedCoins = reward.coins;
-            earnedPp = reward.pp;
             earnedEquipment = reward.equipment;
             message = won ? "Boss je poražen! Protresi telefon da otvoriš kovčeg." : "Borba završena. Protresi telefon za rezultat.";
             persistAfterBattle(currentData.bossNumber, won, nextHp);
+            persistResolvedEncounterLevel(currentData.encounterLevel);
         } else {
             persistBossState(currentData.bossNumber, nextHp);
         }
 
         state.setValue(new BossBattleUiState.Active(new BossBattleUiState.Data(
                 currentData.bossNumber,
+                currentData.encounterLevel,
                 currentData.bossMaxHp,
                 nextHp,
                 currentData.userPp,
@@ -159,7 +160,6 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
                 finished,
                 won,
                 earnedCoins,
-                earnedPp,
                 earnedEquipment,
                 chestOpened,
                 rewardsApplied,
@@ -182,7 +182,7 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
     }
 
     private void applyRewards(BossBattleUiState.Data currentData) {
-        applyBossBattleRewardsUseCase.execute(currentData.earnedCoins, currentData.earnedPp, currentData.earnedEquipment)
+        applyBossBattleRewardsUseCase.execute(currentData.earnedCoins, currentData.earnedEquipment)
                 .thenAccept(result -> new Handler(Looper.getMainLooper()).post(() -> {
                     BossBattleUiState.Data latest = getCurrentData();
                     if (latest == null) return;
@@ -208,18 +208,15 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
 
     private Reward calculateReward(int bossNumber, int bossMaxHp, int remainingHp, boolean won) {
         int coins = BossBattleCalculator.coinsForBoss(bossNumber);
-        int pp = Math.max(1, Math.round(coins / 4f));
         int chancePercent = 20;
 
         if (!won) {
             int damaged = bossMaxHp - remainingHp;
             if (damaged >= bossMaxHp / 2) {
                 coins = Math.round(coins / 2f);
-                pp = Math.max(1, Math.round(pp / 2f));
                 chancePercent = 10;
             } else {
                 coins = 0;
-                pp = 0;
                 chancePercent = 0;
             }
         }
@@ -229,7 +226,7 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
             equipment = random.nextInt(100) < 95 ? "Odeća" : "Oružje";
         }
 
-        return new Reward(coins, pp, equipment);
+        return new Reward(coins, equipment);
     }
 
     private void persistAfterBattle(int currentBossNumber, boolean won, int remainingHp) {
@@ -245,6 +242,16 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
         sharedPreferences.edit()
                 .putInt(KEY_BOSS_NUMBER, bossNumber)
                 .putInt(KEY_BOSS_HP, hp)
+                .apply();
+    }
+
+    private void persistResolvedEncounterLevel(int encounterLevel) {
+        int safeLevel = Math.max(1, encounterLevel);
+        int currentLockedLevel = sharedPreferences.getInt(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL, 0);
+        if (safeLevel <= currentLockedLevel) return;
+
+        sharedPreferences.edit()
+                .putInt(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL, safeLevel)
                 .apply();
     }
 
@@ -264,6 +271,7 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
                                             String message) {
         return new BossBattleUiState.Data(
                 current.bossNumber,
+                current.encounterLevel,
                 current.bossMaxHp,
                 current.bossCurrentHp,
                 current.userPp,
@@ -272,7 +280,6 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
                 current.battleFinished,
                 current.battleWon,
                 current.earnedCoins,
-                current.earnedPp,
                 current.earnedEquipment,
                 chestOpened,
                 rewardsApplied,
@@ -282,12 +289,10 @@ public class BossBattleViewModel extends CoreViewModel<BossBattleUiState, BossBa
 
     private static class Reward {
         final int coins;
-        final int pp;
         final String equipment;
 
-        Reward(int coins, int pp, String equipment) {
+        Reward(int coins, String equipment) {
             this.coins = coins;
-            this.pp = pp;
             this.equipment = equipment;
         }
     }
