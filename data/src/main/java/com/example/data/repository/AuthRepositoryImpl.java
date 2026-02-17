@@ -190,6 +190,18 @@ public class AuthRepositoryImpl implements AuthRepository {
         return future;
     }
 
+
+    @Override
+    public CompletableFuture<Result<Void>> requestPasswordReset(String email) {
+        CompletableFuture<Result<Void>> future = new CompletableFuture<>();
+
+        mAuth.sendPasswordResetEmail(email)
+                .addOnSuccessListener(unused -> future.complete(new Result.Success<>(null)))
+                .addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
+
+        return future;
+    }
+
     @Override
     public CompletableFuture<Result<Boolean>> isEmailVerified() {
         CompletableFuture<Result<Boolean>> future = new CompletableFuture<>();

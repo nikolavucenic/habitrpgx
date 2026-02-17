@@ -38,6 +38,8 @@ public class LoginViewModel extends CoreViewModel<LoginUiState, LoginAction, Log
             performLogin(current);
         } else if (action instanceof LoginAction.OnGoToRegisterClicked) {
             sideEffect.setValue(new LoginSideEffect.NavigateToRegister());
+        } else if (action instanceof LoginAction.OnGoToForgotPasswordClicked) {
+            sideEffect.setValue(new LoginSideEffect.NavigateToForgotPassword());
         }
     }
 
@@ -65,9 +67,34 @@ public class LoginViewModel extends CoreViewModel<LoginUiState, LoginAction, Log
                         } else if (result instanceof Result.Error) {
                             String msg = ((Result.Error<User>) result).message;
                             state.setValue(new LoginUiState.Error(current.getEmail(), current.getPassword(), null, null));
-                            sideEffect.setValue(new LoginSideEffect.ShowToast(msg));
+                            sideEffect.setValue(new LoginSideEffect.ShowToast(mapLoginError(msg)));
                         }
                     });
                 });
+    }
+
+    private String mapLoginError(String message) {
+        if (message == null || message.trim().isEmpty()) {
+            return "Prijava nije uspela. Pokušajte ponovo.";
+        }
+
+        String lower = message.toLowerCase();
+        if (lower.contains("supplied auth credential") || lower.contains("invalid-credential") || lower.contains("wrong-password")) {
+            return "Pogrešan email ili lozinka.";
+        }
+        if (lower.contains("badly formatted") || lower.contains("invalid-email")) {
+            return "Email adresa nije u dobrom formatu.";
+        }
+        if (lower.contains("user-not-found")) {
+            return "Ne postoji nalog sa ovom email adresom.";
+        }
+        if (lower.contains("network")) {
+            return "Proverite internet konekciju i pokušajte ponovo.";
+        }
+        if (lower.contains("too-many-requests")) {
+            return "Previše pokušaja. Sačekajte malo pa pokušajte ponovo.";
+        }
+
+        return "Prijava nije uspela. Proverite podatke i pokušajte ponovo.";
     }
 }

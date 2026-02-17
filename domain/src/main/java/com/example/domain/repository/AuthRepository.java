@@ -13,6 +13,7 @@ public interface AuthRepository {
     CompletableFuture<Result<Void>> logout();
     CompletableFuture<Result<User>> getCurrentUserProfile();
     CompletableFuture<Result<Void>> changePassword(String oldPassword, String newPassword);
+    CompletableFuture<Result<Void>> requestPasswordReset(String email);
     CompletableFuture<Result<Boolean>> isEmailVerified();
     CompletableFuture<Result<Void>> resendVerificationEmail();
     CompletableFuture<Result<Void>> applyBossBattleRewards(int earnedCoins, String earnedEquipment);
