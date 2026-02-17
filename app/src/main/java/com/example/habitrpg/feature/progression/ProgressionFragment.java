@@ -13,7 +13,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.habitrpg.R;
 import com.example.domain.usecase.GetLastResolvedBossEncounterLevelUseCase;
 import com.example.domain.usecase.IsPendingBossEncounterUseCase;
-import com.example.domain.usecase.SetPendingBossEncounterUseCase;
 import com.example.habitrpg.core.CoreFragment;
 import com.example.habitrpg.databinding.FragmentProgressionBinding;
 
@@ -27,8 +26,6 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
     @Inject
     IsPendingBossEncounterUseCase isPendingBossEncounterUseCase;
 
-    @Inject
-    SetPendingBossEncounterUseCase setPendingBossEncounterUseCase;
 
 
     @Inject
