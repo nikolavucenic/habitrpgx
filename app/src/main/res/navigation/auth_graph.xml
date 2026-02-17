@@ -37,7 +37,7 @@
 
     <fragment
         android:id="@+id/forgotPasswordFragment"
-        android:name="com.example.habitrpg.ForgotPasswordFragment"
+        android:name="com.example.habitrpg.feature.forgotpassword.ForgotPasswordFragment"
         android:label="fragment_forgot_password"
         tools:layout="@layout/fragment_forgot_password" />
 

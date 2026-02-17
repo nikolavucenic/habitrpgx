@@ -24,6 +24,7 @@ import com.example.domain.usecase.LogoutUseCase;
 import com.example.domain.usecase.SaveEquipmentStateUseCase;
 import com.example.domain.usecase.PurchaseEquipmentUseCase;
 import com.example.domain.usecase.RegisterUseCase;
+import com.example.domain.usecase.RequestPasswordResetUseCase;
 import com.example.domain.usecase.SaveBossStateUseCase;
 import com.example.domain.usecase.SaveLastResolvedBossEncounterLevelUseCase;
 import com.example.domain.usecase.SetPendingBossEncounterUseCase;
@@ -70,6 +71,12 @@ public class UseCaseModule {
     @Singleton
     public ChangePasswordUseCase provideChangePasswordUseCase(AuthRepository authRepository) {
         return new ChangePasswordUseCase(authRepository);
+    }
+
+    @Provides
+    @Singleton
+    public RequestPasswordResetUseCase provideRequestPasswordResetUseCase(AuthRepository authRepository) {
+        return new RequestPasswordResetUseCase(authRepository);
     }
 
     @Provides

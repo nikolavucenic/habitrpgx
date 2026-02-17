@@ -65,6 +65,9 @@ public class LoginFragment extends CoreFragment<FragmentLoginBinding> {
             else if (effect instanceof LoginSideEffect.NavigateToRegister) {
                 Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_signUpFragment);
             }
+            else if (effect instanceof LoginSideEffect.NavigateToForgotPassword) {
+                Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_forgotPasswordFragment);
+            }
             else if (effect instanceof LoginSideEffect.ShowToast) {
                 Toast.makeText(getContext(), ((LoginSideEffect.ShowToast) effect).message, Toast.LENGTH_SHORT).show();
             }
@@ -74,6 +77,7 @@ public class LoginFragment extends CoreFragment<FragmentLoginBinding> {
     private void setupListeners() {
         getBinding().btnLogin.setOnClickListener(v -> viewModel.handleAction(new LoginAction.OnLoginClicked()));
         getBinding().btnGoToRegister.setOnClickListener(v -> viewModel.handleAction(new LoginAction.OnGoToRegisterClicked()));
+        getBinding().btnForgotPassword.setOnClickListener(v -> viewModel.handleAction(new LoginAction.OnGoToForgotPasswordClicked()));
 
         getBinding().etEmail.addTextChangedListener(new SimpleTextWatcher(s ->
                 viewModel.handleAction(new LoginAction.OnEmailChanged(s))
