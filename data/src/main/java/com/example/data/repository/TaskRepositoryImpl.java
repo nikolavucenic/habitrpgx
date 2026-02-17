@@ -3,6 +3,7 @@ package com.example.data.repository;
 import com.example.domain.core.Result;
 import com.example.domain.model.TaskCategory;
 import com.example.domain.model.TaskItem;
+import com.example.domain.progression.ProgressionCalculator;
 import com.example.domain.repository.TaskRepository;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -17,18 +18,24 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
+
+import android.content.SharedPreferences;
 import javax.inject.Singleton;
 
 @Singleton
 public class TaskRepositoryImpl implements TaskRepository {
 
+    private static final String KEY_PENDING_BOSS_ENCOUNTER = "pending_boss_encounter";
+
     private final FirebaseAuth auth;
     private final FirebaseFirestore db;
+    private final SharedPreferences sharedPreferences;
 
     @Inject
-    public TaskRepositoryImpl(FirebaseFirestore db) {
+    public TaskRepositoryImpl(FirebaseFirestore db, SharedPreferences sharedPreferences) {
         this.auth = FirebaseAuth.getInstance();
         this.db = db;
+        this.sharedPreferences = sharedPreferences;
     }
 
     @Override
@@ -249,11 +256,42 @@ public class TaskRepositoryImpl implements TaskRepository {
     private void incrementUserXp(String uid, int xp, CompletableFuture<Result<Void>> future) {
         DocumentReference userRef = db.collection("users").document(uid);
         userRef.get().addOnSuccessListener(snapshot -> {
-            int currentXp = ((Number) snapshot.get("xp")).intValue();
-            userRef.update("xp", currentXp + xp)
-                    .addOnSuccessListener(unused -> future.complete(new Result.Success<>(null)))
+            int currentLevel = readInt(snapshot.get("level"), 1);
+            int currentXp = readInt(snapshot.get("xp"), 0);
+            int currentPp = readInt(snapshot.get("pp"), 0);
+
+            int level = Math.max(1, currentLevel);
+            int levelXp = Math.max(0, currentXp) + Math.max(0, xp);
+            int pp = Math.max(0, currentPp);
+            boolean leveledUp = false;
+
+            while (levelXp >= ProgressionCalculator.requiredXpForLevel(level)) {
+                levelXp -= ProgressionCalculator.requiredXpForLevel(level);
+                pp += ProgressionCalculator.ppRewardForLevel(level);
+                level++;
+                leveledUp = true;
+            }
+
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("xp", levelXp);
+            updates.put("level", level);
+            updates.put("pp", pp);
+            updates.put("title", ProgressionCalculator.titleForLevel(level));
+
+            userRef.update(updates)
+                    .addOnSuccessListener(unused -> {
+                        if (leveledUp) {
+                            sharedPreferences.edit().putBoolean(KEY_PENDING_BOSS_ENCOUNTER, true).apply();
+                        }
+                        future.complete(new Result.Success<>(null));
+                    })
                     .addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
         }).addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
+    }
+
+    private int readInt(Object value, int fallback) {
+        if (value instanceof Number) return ((Number) value).intValue();
+        return fallback;
     }
 
     private Map<String, Object> toMap(TaskItem item, String status, int awardedXp, long createdAt) {
