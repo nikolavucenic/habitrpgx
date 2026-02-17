@@ -10,7 +10,7 @@ public class ProgressionCalculatorTest {
     public void requiredXpMatchesSpecExamples() {
         assertEquals(200, ProgressionCalculator.requiredXpForLevel(1));
         assertEquals(500, ProgressionCalculator.requiredXpForLevel(2));
-        assertEquals(1300, ProgressionCalculator.requiredXpForLevel(3));
+        assertEquals(1250, ProgressionCalculator.requiredXpForLevel(3));
     }
 
     @Test

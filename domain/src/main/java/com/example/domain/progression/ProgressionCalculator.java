@@ -17,7 +17,7 @@ public final class ProgressionCalculator {
 
         int requiredXp = BASE_XP_FOR_FIRST_LEVEL;
         for (int current = 2; current <= level; current++) {
-            requiredXp = roundUpToNextHundred((int) Math.round(requiredXp * 2.5));
+            requiredXp = (int) Math.round(requiredXp * 2.5);
         }
         return requiredXp;
     }
@@ -64,9 +64,5 @@ public final class ProgressionCalculator {
         map.put("Srednje", scaledXpValue(5, passedLevels));
         map.put("Teško", scaledXpValue(9, passedLevels));
         return map;
-    }
-
-    private static int roundUpToNextHundred(int value) {
-        return ((value + 99) / 100) * 100;
     }
 }

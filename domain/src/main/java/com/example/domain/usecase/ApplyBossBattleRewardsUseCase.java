@@ -12,7 +12,7 @@ public class ApplyBossBattleRewardsUseCase {
         this.repository = repository;
     }
 
-    public CompletableFuture<Result<Void>> execute(int earnedCoins, int earnedPp, String earnedEquipment) {
-        return repository.applyBossBattleRewards(earnedCoins, earnedPp, earnedEquipment);
+    public CompletableFuture<Result<Void>> execute(int earnedCoins, String earnedEquipment) {
+        return repository.applyBossBattleRewards(earnedCoins, earnedEquipment);
     }
 }

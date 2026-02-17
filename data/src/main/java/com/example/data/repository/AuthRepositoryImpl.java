@@ -216,7 +216,7 @@ public class AuthRepositoryImpl implements AuthRepository {
     }
 
     @Override
-    public CompletableFuture<Result<Void>> applyBossBattleRewards(int earnedCoins, int earnedPp, String earnedEquipment) {
+    public CompletableFuture<Result<Void>> applyBossBattleRewards(int earnedCoins, String earnedEquipment) {
         CompletableFuture<Result<Void>> future = new CompletableFuture<>();
         FirebaseUser current = mAuth.getCurrentUser();
 
@@ -235,7 +235,6 @@ public class AuthRepositoryImpl implements AuthRepository {
 
                     User user = mapToUser(doc);
                     int nextCoins = Math.max(0, user.coins) + Math.max(0, earnedCoins);
-                    int nextPp = Math.max(0, user.pp) + Math.max(0, earnedPp);
 
                     List<String> nextEquipment = new ArrayList<>(user.equipment != null ? user.equipment : new ArrayList<>());
                     if (earnedEquipment != null && !earnedEquipment.trim().isEmpty()) {
@@ -245,7 +244,6 @@ public class AuthRepositoryImpl implements AuthRepository {
 
                     Map<String, Object> updates = new HashMap<>();
                     updates.put("coins", nextCoins);
-                    updates.put("pp", nextPp);
                     updates.put("equipment", new ArrayList<>(deduplicated));
 
                     mDb.collection("users").document(current.getUid()).update(updates)

@@ -23,6 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding> {
 
     private static final String KEY_PENDING_BOSS_ENCOUNTER = "pending_boss_encounter";
+    private static final String KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL = "last_resolved_boss_encounter_level";
 
     @Inject
     SharedPreferences sharedPreferences;
@@ -57,7 +58,9 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
             getBinding().tvXpNeeded.setText(getString(R.string.progression_xp_needed_value, remaining));
             getBinding().tvImportanceValues.setText(data.importancePreview);
             getBinding().tvDifficultyValues.setText(data.difficultyPreview);
-            getBinding().btnStartBossBattle.setVisibility(data.canStartBossEncounter ? View.VISIBLE : View.GONE);
+            int lockedBossEncounterLevel = sharedPreferences.getInt(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL, 0);
+            boolean canStartBossEncounter = data.canStartBossEncounter && data.level > lockedBossEncounterLevel;
+            getBinding().btnStartBossBattle.setVisibility(canStartBossEncounter ? View.VISIBLE : View.GONE);
 
             if (state instanceof ProgressionUiState.Error) {
                 getBinding().tvError.setVisibility(View.VISIBLE);
@@ -78,7 +81,9 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
 
         boolean pendingBoss = sharedPreferences.getBoolean(KEY_PENDING_BOSS_ENCOUNTER, false);
         if (!pendingBoss) return;
-        if (!state.getData().canStartBossEncounter) return;
+        int lockedBossEncounterLevel = sharedPreferences.getInt(KEY_LAST_RESOLVED_BOSS_ENCOUNTER_LEVEL, 0);
+        boolean canStartBossEncounter = state.getData().canStartBossEncounter && state.getData().level > lockedBossEncounterLevel;
+        if (!canStartBossEncounter) return;
 
         autoNavigationHandled = true;
         sharedPreferences.edit().putBoolean(KEY_PENDING_BOSS_ENCOUNTER, false).apply();
