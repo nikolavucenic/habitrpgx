@@ -57,6 +57,7 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
             getBinding().tvXpNeeded.setText(getString(R.string.progression_xp_needed_value, remaining));
             getBinding().tvImportanceValues.setText(data.importancePreview);
             getBinding().tvDifficultyValues.setText(data.difficultyPreview);
+            getBinding().btnStartBossBattle.setVisibility(data.canStartBossEncounter ? View.VISIBLE : View.GONE);
 
             if (state instanceof ProgressionUiState.Error) {
                 getBinding().tvError.setVisibility(View.VISIBLE);
@@ -77,6 +78,7 @@ public class ProgressionFragment extends CoreFragment<FragmentProgressionBinding
 
         boolean pendingBoss = sharedPreferences.getBoolean(KEY_PENDING_BOSS_ENCOUNTER, false);
         if (!pendingBoss) return;
+        if (!state.getData().canStartBossEncounter) return;
 
         autoNavigationHandled = true;
         sharedPreferences.edit().putBoolean(KEY_PENDING_BOSS_ENCOUNTER, false).apply();

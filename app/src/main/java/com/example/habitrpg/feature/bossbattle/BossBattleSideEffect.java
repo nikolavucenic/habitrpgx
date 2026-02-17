@@ -12,4 +12,5 @@ public abstract class BossBattleSideEffect {
     public static final class PlayBossHitAnimation extends BossBattleSideEffect {}
     public static final class PlayBossMissAnimation extends BossBattleSideEffect {}
     public static final class PlayChestShakeAnimation extends BossBattleSideEffect {}
+    public static final class NavigateBack extends BossBattleSideEffect {}
 }

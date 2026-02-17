@@ -64,6 +64,7 @@ public class ProgressionViewModel extends ViewModel {
                 pp,
                 Math.max(user.xp, 0),
                 requiredXp,
+                user.level > 1,
                 formatPreview(ProgressionCalculator.importanceXpByPassedLevel(passedLevels)),
                 formatPreview(ProgressionCalculator.difficultyXpByPassedLevel(passedLevels))
         );

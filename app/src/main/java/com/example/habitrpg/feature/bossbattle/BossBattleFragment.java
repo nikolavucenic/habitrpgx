@@ -15,6 +15,7 @@ import android.view.animation.CycleInterpolator;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.habitrpg.R;
 import com.example.habitrpg.core.CoreFragment;
@@ -46,6 +47,7 @@ public class BossBattleFragment extends CoreFragment<FragmentBossBattleBinding> 
         }
 
         getBinding().btnAttack.setOnClickListener(v -> viewModel.handleAction(new BossBattleAction.OnAttackClicked()));
+        getBinding().btnContinue.setOnClickListener(v -> viewModel.handleAction(new BossBattleAction.OnContinueClicked()));
         getBinding().btnEquipment.setOnClickListener(v -> viewModel.handleAction(new BossBattleAction.OnActivateEquipmentClicked()));
         getBinding().ivChest.setOnClickListener(v -> viewModel.handleAction(new BossBattleAction.OnShakeChestTriggered()));
 
@@ -72,31 +74,36 @@ public class BossBattleFragment extends CoreFragment<FragmentBossBattleBinding> 
     }
 
     private void render(BossBattleUiState state) {
-        getBinding().tvBossName.setText(getString(R.string.boss_name_value, state.bossNumber));
-        getBinding().tvBossHp.setText(getString(R.string.boss_hp_value, state.bossCurrentHp, state.bossMaxHp));
-        getBinding().tvUserPp.setText(getString(R.string.boss_pp_value, state.userPp));
-        getBinding().tvChance.setText(getString(R.string.boss_chance_value, state.successChance));
-        getBinding().tvAttempts.setText(getString(R.string.boss_attempts_value, state.attacksLeft));
+        BossBattleUiState.Data data = state.getData();
+
+        getBinding().tvBossName.setText(getString(R.string.boss_name_value, data.bossNumber));
+        getBinding().tvBossHp.setText(getString(R.string.boss_hp_value, data.bossCurrentHp, data.bossMaxHp));
+        getBinding().tvUserPp.setText(getString(R.string.boss_pp_value, data.userPp));
+        getBinding().tvChance.setText(getString(R.string.boss_chance_value, data.successChance));
+        getBinding().tvAttempts.setText(getString(R.string.boss_attempts_value, data.attacksLeft));
         getBinding().tvEquipmentStatus.setText(R.string.boss_equipment_placeholder);
-        getBinding().tvBattleLog.setText(state.battleMessage);
+        getBinding().tvBattleLog.setText(data.battleMessage);
 
-        getBinding().progressBossHp.setMax(Math.max(1, state.bossMaxHp));
-        getBinding().progressBossHp.setProgress(state.bossCurrentHp);
-        getBinding().progressUserPp.setMax(Math.max(1, state.bossMaxHp));
-        getBinding().progressUserPp.setProgress(Math.min(state.userPp, state.bossMaxHp));
+        getBinding().progressBossHp.setMax(Math.max(1, data.bossMaxHp));
+        getBinding().progressBossHp.setProgress(data.bossCurrentHp);
+        getBinding().progressUserPp.setMax(Math.max(1, data.bossMaxHp));
+        getBinding().progressUserPp.setProgress(Math.min(data.userPp, data.bossMaxHp));
 
-        getBinding().btnAttack.setEnabled(!state.loading && !state.battleFinished && state.attacksLeft > 0);
+        getBinding().btnAttack.setEnabled(!(state instanceof BossBattleUiState.Loading) && !data.battleFinished && data.attacksLeft > 0);
 
-        boolean showChest = state.battleFinished;
+        boolean showChest = data.battleFinished;
         getBinding().chestContainer.setVisibility(showChest ? View.VISIBLE : View.GONE);
-        getBinding().ivChest.setImageResource(state.chestOpened ? R.drawable.ic_chest_open : R.drawable.ic_chest_closed);
-        getBinding().tvChestHint.setText(state.chestOpened ? getString(R.string.boss_chest_opened_hint) : getString(R.string.boss_chest_closed_hint));
+        getBinding().ivChest.setImageResource(data.chestOpened ? R.drawable.ic_chest_open : R.drawable.ic_chest_closed);
+        getBinding().tvChestHint.setText(data.chestOpened ? getString(R.string.boss_chest_opened_hint) : getString(R.string.boss_chest_closed_hint));
+        getBinding().btnContinue.setVisibility(data.chestOpened ? View.VISIBLE : View.GONE);
+        getBinding().btnContinue.setEnabled(data.rewardsApplied);
 
-        if (state.chestOpened) {
+        if (data.chestOpened) {
             getBinding().tvRewards.setText(getString(
                     R.string.boss_rewards_value,
-                    state.earnedCoins,
-                    state.earnedEquipment == null ? getString(R.string.boss_no_equipment) : state.earnedEquipment
+                    data.earnedCoins,
+                    data.earnedPp,
+                    data.earnedEquipment == null ? getString(R.string.boss_no_equipment) : data.earnedEquipment
             ));
         } else {
             getBinding().tvRewards.setText("");
@@ -113,6 +120,8 @@ public class BossBattleFragment extends CoreFragment<FragmentBossBattleBinding> 
             shakeView(getBinding().ivBoss);
         } else if (effect instanceof BossBattleSideEffect.PlayChestShakeAnimation) {
             shakeView(getBinding().ivChest);
+        } else if (effect instanceof BossBattleSideEffect.NavigateBack) {
+            NavHostFragment.findNavController(this).popBackStack();
         }
     }
 
@@ -135,7 +144,7 @@ public class BossBattleFragment extends CoreFragment<FragmentBossBattleBinding> 
             lastShakeTs = now;
             BossBattleUiState state = viewModel.getState().getValue();
             if (state == null) return;
-            if (state.battleFinished) {
+            if (state.getData().battleFinished) {
                 viewModel.handleAction(new BossBattleAction.OnShakeChestTriggered());
             } else {
                 viewModel.handleAction(new BossBattleAction.OnShakeAttackTriggered());

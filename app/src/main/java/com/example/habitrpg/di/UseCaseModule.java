@@ -4,6 +4,7 @@ import com.example.domain.repository.AuthRepository;
 import com.example.domain.repository.TaskRepository;
 import com.example.domain.usecase.ChangeTaskStatusUseCase;
 import com.example.domain.usecase.ChangePasswordUseCase;
+import com.example.domain.usecase.ApplyBossBattleRewardsUseCase;
 import com.example.domain.usecase.CreateCategoryUseCase;
 import com.example.domain.usecase.CreateTaskUseCase;
 import com.example.domain.usecase.DeleteCategoryUseCase;
@@ -51,6 +52,12 @@ public class UseCaseModule {
     @Singleton
     public ChangePasswordUseCase provideChangePasswordUseCase(AuthRepository authRepository) {
         return new ChangePasswordUseCase(authRepository);
+    }
+
+    @Provides
+    @Singleton
+    public ApplyBossBattleRewardsUseCase provideApplyBossBattleRewardsUseCase(AuthRepository authRepository) {
+        return new ApplyBossBattleRewardsUseCase(authRepository);
     }
 
     @Provides

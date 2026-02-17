@@ -13,8 +13,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -210,6 +212,48 @@ public class AuthRepositoryImpl implements AuthRepository {
         current.sendEmailVerification()
                 .addOnSuccessListener(unused -> future.complete(new Result.Success<>(null)))
                 .addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<Result<Void>> applyBossBattleRewards(int earnedCoins, int earnedPp, String earnedEquipment) {
+        CompletableFuture<Result<Void>> future = new CompletableFuture<>();
+        FirebaseUser current = mAuth.getCurrentUser();
+
+        if (current == null) {
+            future.complete(new Result.Error<>("Nema aktivnog korisnika."));
+            return future;
+        }
+
+        mDb.collection("users").document(current.getUid()).get()
+                .addOnSuccessListener(snapshot -> {
+                    Map<String, Object> doc = snapshot.getData();
+                    if (doc == null) {
+                        future.complete(new Result.Error<>("Profil nije pronađen."));
+                        return;
+                    }
+
+                    User user = mapToUser(doc);
+                    int nextCoins = Math.max(0, user.coins) + Math.max(0, earnedCoins);
+                    int nextPp = Math.max(0, user.pp) + Math.max(0, earnedPp);
+
+                    List<String> nextEquipment = new ArrayList<>(user.equipment != null ? user.equipment : new ArrayList<>());
+                    if (earnedEquipment != null && !earnedEquipment.trim().isEmpty()) {
+                        nextEquipment.add(earnedEquipment);
+                    }
+                    Set<String> deduplicated = new LinkedHashSet<>(nextEquipment);
+
+                    Map<String, Object> updates = new HashMap<>();
+                    updates.put("coins", nextCoins);
+                    updates.put("pp", nextPp);
+                    updates.put("equipment", new ArrayList<>(deduplicated));
+
+                    mDb.collection("users").document(current.getUid()).update(updates)
+                            .addOnSuccessListener(unused -> future.complete(new Result.Success<>(null)))
+                            .addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
+                })
+                .addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
+
         return future;
     }
 
