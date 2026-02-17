@@ -1,13 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/alliance"
-        android:textStyle="bold"
-        android:textSize="22sp" />
-</FrameLayout>
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Prijatelji i savez"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Pretraga korisnika po username" />
+
+        <Button
+            android:id="@+id/btnSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pretraži" />
+
+        <TextView
+            android:id="@+id/tvSearchResults"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rezultati pretrage" />
+
+        <TextView
+            android:id="@+id/tvFriends"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Moji prijatelji" />
+
+        <EditText
+            android:id="@+id/etAllianceName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Naziv saveza" />
+
+        <Button
+            android:id="@+id/btnCreateAlliance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kreiraj savez (pozovi sve prijatelje)" />
+
+        <TextView
+            android:id="@+id/tvInvites"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Pozivnice" />
+
+        <Button
+            android:id="@+id/btnStartMission"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pokreni specijalnu misiju" />
+
+        <TextView
+            android:id="@+id/tvAlliance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Savez" />
+
+        <TextView
+            android:id="@+id/tvMessages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Poruke" />
+
+        <EditText
+            android:id="@+id/etMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Pošalji poruku savezu" />
+
+        <Button
+            android:id="@+id/btnSendMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pošalji" />
+
+    </LinearLayout>
+</ScrollView>

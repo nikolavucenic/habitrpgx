@@ -16,6 +16,8 @@ import com.example.domain.usecase.GetTasksUseCase;
 import com.example.domain.usecase.UpdateCategoryUseCase;
 import com.example.domain.usecase.UpdateTaskUseCase;
 import com.example.habitrpg.core.CoreViewModel;
+import com.example.domain.usecase.SocialUseCase;
+import com.example.domain.model.SpecialMissionEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,7 @@ public class TasksViewModel extends CoreViewModel<TasksUiState, TasksAction, Tas
     private final UpdateCategoryUseCase updateCategoryUseCase;
     private final DeleteCategoryUseCase deleteCategoryUseCase;
     private final ChangeTaskStatusUseCase changeTaskStatusUseCase;
+    private final SocialUseCase socialUseCase;
 
     @Inject
     public TasksViewModel(GetTasksUseCase getTasksUseCase,
@@ -46,7 +49,8 @@ public class TasksViewModel extends CoreViewModel<TasksUiState, TasksAction, Tas
                           CreateCategoryUseCase createCategoryUseCase,
                           UpdateCategoryUseCase updateCategoryUseCase,
                           DeleteCategoryUseCase deleteCategoryUseCase,
-                          ChangeTaskStatusUseCase changeTaskStatusUseCase) {
+                          ChangeTaskStatusUseCase changeTaskStatusUseCase,
+                          SocialUseCase socialUseCase) {
         this.getTasksUseCase = getTasksUseCase;
         this.getCategoriesUseCase = getCategoriesUseCase;
         this.createTaskUseCase = createTaskUseCase;
@@ -56,6 +60,7 @@ public class TasksViewModel extends CoreViewModel<TasksUiState, TasksAction, Tas
         this.updateCategoryUseCase = updateCategoryUseCase;
         this.deleteCategoryUseCase = deleteCategoryUseCase;
         this.changeTaskStatusUseCase = changeTaskStatusUseCase;
+        this.socialUseCase = socialUseCase;
         state.setValue(TasksUiState.initial());
     }
 
@@ -266,9 +271,20 @@ public class TasksViewModel extends CoreViewModel<TasksUiState, TasksAction, Tas
     }
 
     private void changeStatus(TasksAction.ChangeStatus action) {
+        TasksUiState current = state.getValue();
+        final TaskItem task = current == null ? null : findTask(current.getTasks(), action.taskId);
+
         changeTaskStatusUseCase.execute(action.taskId, action.newStatus)
                 .thenAccept(result -> new Handler(Looper.getMainLooper()).post(() -> {
                     if (result instanceof Result.Success) {
+                        if (TaskItem.STATUS_DONE.equals(action.newStatus) && task != null) {
+                            String difficulty = task.getDifficulty() == null ? "" : task.getDifficulty().toLowerCase();
+                            if (difficulty.contains("veoma") || difficulty.contains("lak") || difficulty.contains("normal") || difficulty.contains("važ")) {
+                                socialUseCase.trackMissionEvent(SpecialMissionEvent.SIMPLE_TASK, 1);
+                            } else {
+                                socialUseCase.trackMissionEvent(SpecialMissionEvent.COMPLEX_TASK, 1);
+                            }
+                        }
                         sideEffect.setValue(new TasksSideEffect.ShowToast("Status je ažuriran."));
                         loadAll();
                     } else {
