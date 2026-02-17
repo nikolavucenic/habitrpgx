@@ -1,242 +1,249 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:padding="16dp"
     tools:context=".feature.profile.ProfileFragment">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:padding="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/profile_title"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            app:cardCornerRadius="16dp"
-            app:strokeColor="#1F6750A4"
-            app:strokeWidth="1dp">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_title"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:layout_marginTop="12dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="#1F6750A4"
+                app:strokeWidth="1dp">
 
-                <ImageView
-                    android:id="@+id/iv_avatar"
-                    android:layout_width="88dp"
-                    android:layout_height="88dp"
-                    android:layout_gravity="center_horizontal"
-                    android:contentDescription="@string/profile_avatar_content_description"
-                    android:src="@drawable/avatar_1"
-                    tools:src="@drawable/avatar_3" />
-
-                <TextView
-                    android:id="@+id/tv_username"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="10dp"
-                    android:textStyle="bold"
-                    android:textSize="18sp"
-                    tools:text="Heroj123" />
-
-                <TextView
-                    android:id="@+id/tv_level"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    tools:text="Nivo: 1" />
+                    android:orientation="vertical"
+                    android:padding="14dp">
 
-                <TextView
-                    android:id="@+id/tv_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    tools:text="Titula: Početnik navika" />
+                    <ImageView
+                        android:id="@+id/iv_avatar"
+                        android:layout_width="88dp"
+                        android:layout_height="88dp"
+                        android:layout_gravity="center_horizontal"
+                        android:contentDescription="@string/profile_avatar_content_description"
+                        android:src="@drawable/avatar_1"
+                        tools:src="@drawable/avatar_3" />
 
-                <TextView
-                    android:id="@+id/tv_xp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    tools:text="XP: 0" />
+                    <TextView
+                        android:id="@+id/tv_username"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="10dp"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        tools:text="Heroj123" />
 
-                <TextView
-                    android:id="@+id/tv_badges"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    tools:text="Bedževi (0): nema" />
+                    <TextView
+                        android:id="@+id/tv_level"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        tools:text="Nivo: 1" />
 
-                <TextView
-                    android:id="@+id/tv_equipment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    tools:text="Oprema: nema" />
+                    <TextView
+                        android:id="@+id/tv_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        tools:text="Titula: Početnik navika" />
 
-                <ImageView
-                    android:id="@+id/iv_qr_code"
-                    android:layout_width="180dp"
-                    android:layout_height="180dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="12dp"
-                    android:contentDescription="@string/profile_qr_content_description" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+                    <TextView
+                        android:id="@+id/tv_xp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        tools:text="XP: 0" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            app:cardCornerRadius="16dp"
-            app:strokeColor="#146750A4"
-            app:strokeWidth="1dp">
+                    <TextView
+                        android:id="@+id/tv_badges"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        tools:text="Bedževi (0): nema" />
 
-            <LinearLayout
+                    <TextView
+                        android:id="@+id/tv_equipment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        tools:text="Oprema: nema" />
+
+                    <ImageView
+                        android:id="@+id/iv_qr_code"
+                        android:layout_width="180dp"
+                        android:layout_height="180dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="12dp"
+                        android:contentDescription="@string/profile_qr_content_description" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:layout_marginTop="12dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="#146750A4"
+                app:strokeWidth="1dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/profile_private_data_title"
-                    android:textStyle="bold" />
+                    android:orientation="vertical"
+                    android:padding="14dp">
 
-                <TextView
-                    android:id="@+id/tv_pp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    tools:text="PP: 0" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/profile_private_data_title"
+                        android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/tv_coins"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    tools:text="Novčići: 0" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+                    <TextView
+                        android:id="@+id/tv_pp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        tools:text="PP: 0" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            app:cardCornerRadius="16dp"
-            app:strokeColor="#146750A4"
-            app:strokeWidth="1dp">
+                    <TextView
+                        android:id="@+id/tv_coins"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        tools:text="Novčići: 0" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:layout_marginTop="12dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="#146750A4"
+                app:strokeWidth="1dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/profile_change_password_title"
-                    android:textStyle="bold" />
+                    android:orientation="vertical"
+                    android:padding="14dp">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/til_old_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    app:endIconMode="password_toggle">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_old_password"
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/profile_old_password"
-                        android:inputType="textPassword" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:text="@string/profile_change_password_title"
+                        android:textStyle="bold" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/til_new_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    app:endIconMode="password_toggle">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_new_password"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_old_password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/profile_new_password"
-                        android:inputType="textPassword" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_marginTop="10dp"
+                        app:endIconMode="password_toggle">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/til_confirm_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    app:endIconMode="password_toggle">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_old_password"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/profile_old_password"
+                            android:inputType="textPassword" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_confirm_password"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_new_password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/profile_confirm_new_password"
-                        android:inputType="textPassword" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_marginTop="8dp"
+                        app:endIconMode="password_toggle">
 
-                <Button
-                    android:id="@+id/btn_change_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="@string/profile_change_password_button" />
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_new_password"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/profile_new_password"
+                            android:inputType="textPassword" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                <Button
-                    android:id="@+id/btn_logout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:backgroundTint="#B00020"
-                    android:text="@string/profile_logout"
-                    android:textColor="@android:color/white" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_confirm_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:endIconMode="password_toggle">
 
-                <TextView
-                    android:id="@+id/tv_error"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:textColor="#B00020"
-                    android:visibility="gone"
-                    tools:text="Greška" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_confirm_password"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/profile_confirm_new_password"
+                            android:inputType="textPassword" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-        <FrameLayout
-            android:id="@+id/loading_overlay"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:foregroundGravity="center"
-            android:visibility="gone">
+                    <Button
+                        android:id="@+id/btn_change_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/profile_change_password_button" />
 
-            <ProgressBar
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center" />
-        </FrameLayout>
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+                    <Button
+                        android:id="@+id/btn_logout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:backgroundTint="#B00020"
+                        android:text="@string/profile_logout"
+                        android:textColor="@android:color/white" />
+
+                    <TextView
+                        android:id="@+id/tv_error"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textColor="#B00020"
+                        android:visibility="gone"
+                        tools:text="Greška" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <FrameLayout
+        android:id="@+id/loading_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center" />
+    </FrameLayout>
+</FrameLayout>
