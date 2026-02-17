@@ -13,10 +13,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -245,11 +243,9 @@ public class AuthRepositoryImpl implements AuthRepository {
                     if (earnedEquipment != null && !earnedEquipment.trim().isEmpty()) {
                         nextEquipment.add(earnedEquipment);
                     }
-                    Set<String> deduplicated = new LinkedHashSet<>(nextEquipment);
-
                     Map<String, Object> updates = new HashMap<>();
                     updates.put("coins", nextCoins);
-                    updates.put("equipment", new ArrayList<>(deduplicated));
+                    updates.put("equipment", new ArrayList<>(nextEquipment));
 
                     mDb.collection("users").document(current.getUid()).update(updates)
                             .addOnSuccessListener(unused -> future.complete(new Result.Success<>(null)))
@@ -260,6 +256,67 @@ public class AuthRepositoryImpl implements AuthRepository {
         return future;
     }
 
+
+    @Override
+    public CompletableFuture<Result<Void>> purchaseEquipment(String equipmentId, int cost) {
+        CompletableFuture<Result<Void>> future = new CompletableFuture<>();
+        FirebaseUser current = mAuth.getCurrentUser();
+
+        if (current == null) {
+            future.complete(new Result.Error<>("Nema aktivnog korisnika."));
+            return future;
+        }
+
+        mDb.collection("users").document(current.getUid()).get()
+                .addOnSuccessListener(snapshot -> {
+                    Map<String, Object> doc = snapshot.getData();
+                    if (doc == null) {
+                        future.complete(new Result.Error<>("Profil nije pronađen."));
+                        return;
+                    }
+                    User user = mapToUser(doc);
+                    int normalizedCost = Math.max(0, cost);
+                    if (user.coins < normalizedCost) {
+                        future.complete(new Result.Error<>("Nemate dovoljno novčića."));
+                        return;
+                    }
+
+                    List<String> nextEquipment = new ArrayList<>(user.equipment != null ? user.equipment : new ArrayList<>());
+                    nextEquipment.add(equipmentId);
+
+                    Map<String, Object> updates = new HashMap<>();
+                    updates.put("coins", user.coins - normalizedCost);
+                    updates.put("equipment", nextEquipment);
+
+                    mDb.collection("users").document(current.getUid()).update(updates)
+                            .addOnSuccessListener(unused -> future.complete(new Result.Success<>(null)))
+                            .addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
+                })
+                .addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
+
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<Result<Void>> saveEquipmentState(List<String> equipment, int coins) {
+        CompletableFuture<Result<Void>> future = new CompletableFuture<>();
+        FirebaseUser current = mAuth.getCurrentUser();
+
+        if (current == null) {
+            future.complete(new Result.Error<>("Nema aktivnog korisnika."));
+            return future;
+        }
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("equipment", new ArrayList<>(equipment != null ? equipment : new ArrayList<>()));
+        if (coins >= 0) updates.put("coins", coins);
+
+        mDb.collection("users").document(current.getUid()).update(updates)
+                .addOnSuccessListener(unused -> future.complete(new Result.Success<>(null)))
+                .addOnFailureListener(e -> future.complete(new Result.Error<>(e.getMessage())));
+
+        return future;
+    }
 
     private User normalizeAndPersistProgressIfNeeded(String uid, User user) {
         int level = Math.max(1, user.level);

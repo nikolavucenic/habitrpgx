@@ -20,6 +20,8 @@ import com.example.domain.usecase.IsLoggedInUseCase;
 import com.example.domain.usecase.IsPendingBossEncounterUseCase;
 import com.example.domain.usecase.LoginUseCase;
 import com.example.domain.usecase.LogoutUseCase;
+import com.example.domain.usecase.SaveEquipmentStateUseCase;
+import com.example.domain.usecase.PurchaseEquipmentUseCase;
 import com.example.domain.usecase.RegisterUseCase;
 import com.example.domain.usecase.SaveBossStateUseCase;
 import com.example.domain.usecase.SaveLastResolvedBossEncounterLevelUseCase;
@@ -74,6 +76,18 @@ public class UseCaseModule {
         return new ApplyBossBattleRewardsUseCase(authRepository);
     }
 
+
+    @Provides
+    @Singleton
+    public PurchaseEquipmentUseCase providePurchaseEquipmentUseCase(AuthRepository authRepository) {
+        return new PurchaseEquipmentUseCase(authRepository);
+    }
+
+    @Provides
+    @Singleton
+    public SaveEquipmentStateUseCase provideSaveEquipmentStateUseCase(AuthRepository authRepository) {
+        return new SaveEquipmentStateUseCase(authRepository);
+    }
     @Provides
     @Singleton
     public LogoutUseCase provideLogoutUseCase(AuthRepository authRepository) {
