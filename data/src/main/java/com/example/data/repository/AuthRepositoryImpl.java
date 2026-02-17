@@ -38,6 +38,11 @@ public class AuthRepositoryImpl implements AuthRepository {
     }
 
     @Override
+    public boolean isLoggedIn() {
+        return sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false);
+    }
+
+    @Override
     public CompletableFuture<Result<Void>> register(String email, String password, String username, int avatarId) {
         CompletableFuture<Result<Void>> future = new CompletableFuture<>();
 

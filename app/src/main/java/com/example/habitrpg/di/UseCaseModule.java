@@ -2,29 +2,37 @@ package com.example.habitrpg.di;
 
 import com.example.domain.repository.AuthRepository;
 import com.example.domain.repository.TaskRepository;
-import com.example.domain.usecase.ChangeTaskStatusUseCase;
-import com.example.domain.usecase.ChangePasswordUseCase;
 import com.example.domain.usecase.ApplyBossBattleRewardsUseCase;
+import com.example.domain.usecase.ChangePasswordUseCase;
+import com.example.domain.usecase.ChangeTaskStatusUseCase;
 import com.example.domain.usecase.CreateCategoryUseCase;
 import com.example.domain.usecase.CreateTaskUseCase;
 import com.example.domain.usecase.DeleteCategoryUseCase;
 import com.example.domain.usecase.DeleteTaskUseCase;
+import com.example.domain.usecase.GetBossHpUseCase;
+import com.example.domain.usecase.GetBossNumberUseCase;
 import com.example.domain.usecase.GetCategoriesUseCase;
 import com.example.domain.usecase.GetCurrentUserProfileUseCase;
-import com.example.domain.usecase.GetTasksUseCase;
+import com.example.domain.usecase.GetLastResolvedBossEncounterLevelUseCase;
 import com.example.domain.usecase.GetStageSuccessRateUseCase;
+import com.example.domain.usecase.GetTasksUseCase;
+import com.example.domain.usecase.IsLoggedInUseCase;
+import com.example.domain.usecase.IsPendingBossEncounterUseCase;
 import com.example.domain.usecase.LoginUseCase;
 import com.example.domain.usecase.LogoutUseCase;
 import com.example.domain.usecase.RegisterUseCase;
+import com.example.domain.usecase.SaveBossStateUseCase;
+import com.example.domain.usecase.SaveLastResolvedBossEncounterLevelUseCase;
+import com.example.domain.usecase.SetPendingBossEncounterUseCase;
 import com.example.domain.usecase.UpdateCategoryUseCase;
 import com.example.domain.usecase.UpdateTaskUseCase;
+
+import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
 import dagger.hilt.components.SingletonComponent;
-
-import javax.inject.Singleton;
 
 @Module
 @InstallIn(SingletonComponent.class)
@@ -34,6 +42,12 @@ public class UseCaseModule {
     @Singleton
     public LoginUseCase provideLoginUseCase(AuthRepository authRepository) {
         return new LoginUseCase(authRepository);
+    }
+
+    @Provides
+    @Singleton
+    public IsLoggedInUseCase provideIsLoggedInUseCase(AuthRepository authRepository) {
+        return new IsLoggedInUseCase(authRepository);
     }
 
     @Provides
@@ -64,6 +78,48 @@ public class UseCaseModule {
     @Singleton
     public LogoutUseCase provideLogoutUseCase(AuthRepository authRepository) {
         return new LogoutUseCase(authRepository);
+    }
+
+    @Provides
+    @Singleton
+    public IsPendingBossEncounterUseCase provideIsPendingBossEncounterUseCase(TaskRepository taskRepository) {
+        return new IsPendingBossEncounterUseCase(taskRepository);
+    }
+
+    @Provides
+    @Singleton
+    public SetPendingBossEncounterUseCase provideSetPendingBossEncounterUseCase(TaskRepository taskRepository) {
+        return new SetPendingBossEncounterUseCase(taskRepository);
+    }
+
+    @Provides
+    @Singleton
+    public GetLastResolvedBossEncounterLevelUseCase provideGetLastResolvedBossEncounterLevelUseCase(TaskRepository taskRepository) {
+        return new GetLastResolvedBossEncounterLevelUseCase(taskRepository);
+    }
+
+    @Provides
+    @Singleton
+    public SaveLastResolvedBossEncounterLevelUseCase provideSaveLastResolvedBossEncounterLevelUseCase(TaskRepository taskRepository) {
+        return new SaveLastResolvedBossEncounterLevelUseCase(taskRepository);
+    }
+
+    @Provides
+    @Singleton
+    public GetBossNumberUseCase provideGetBossNumberUseCase(TaskRepository taskRepository) {
+        return new GetBossNumberUseCase(taskRepository);
+    }
+
+    @Provides
+    @Singleton
+    public GetBossHpUseCase provideGetBossHpUseCase(TaskRepository taskRepository) {
+        return new GetBossHpUseCase(taskRepository);
+    }
+
+    @Provides
+    @Singleton
+    public SaveBossStateUseCase provideSaveBossStateUseCase(TaskRepository taskRepository) {
+        return new SaveBossStateUseCase(taskRepository);
     }
 
     @Provides
